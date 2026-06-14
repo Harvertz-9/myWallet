@@ -1,0 +1,7 @@
+{
+  "name": "myWallet",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "vue-vite"
+}
