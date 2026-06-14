@@ -1,1 +1,97 @@
 @import "tailwindcss";
+
+@theme {
+  --color-primary: #10B981;
+  --color-primary-dark: #059669;
+  --color-income: #22C55E;
+  --color-expense: #EF4444;
+  
+  --color-bg-light: #F9FAFB;
+  --color-bg-dark: #111827;
+  --color-card-dark: #1F2937;
+  
+  --radius-card: 20px;
+  --radius-button: 16px;
+  --radius-input: 16px;
+  --radius-modal: 24px;
+
+  --animate-scale-up: scaleUp 0.2s ease-out;
+  --animate-fade-in: fadeIn 0.25s ease-out;
+}
+
+@keyframes scaleUp {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Custom Base Styles */
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background-color: var(--color-bg-light);
+  color: #111827;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+body.dark {
+  background-color: var(--color-bg-dark);
+  color: #F9FAFB;
+}
+
+/* Glassmorphism utility */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.dark .glass-panel {
+  background: rgba(31, 41, 55, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Custom Card & Shadows */
+.custom-card {
+  border-radius: var(--radius-card);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.custom-card:active {
+  transform: scale(0.98);
+}
+
+/* Hide scrollbars but keep scrolling */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Ionic Component overrides to respect dark mode */
+.dark ion-content, 
+.dark ion-page, 
+.dark ion-header, 
+.dark ion-toolbar,
+.dark ion-item,
+.dark ion-list,
+.dark ion-tab-bar {
+  --background: var(--color-bg-dark) !important;
+  --ion-background-color: var(--color-bg-dark) !important;
+  --color: #F9FAFB !important;
+}
+
+/* Smooth active button state */
+.btn-press:active {
+  transform: scale(0.96);
+  opacity: 0.9;
+}
