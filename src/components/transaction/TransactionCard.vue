@@ -42,7 +42,7 @@
             </div>
             <p
               v-if="transaction.note"
-              class="text-xs text-gray-400 dark:text-gray-500 italic mt-0.5 truncate max-w-[180px]"
+              class="text-xs text-gray-400 dark:text-gray-500 italic mt-0.5 truncate max-w-45"
             >
               "{{ transaction.note }}"
             </p>

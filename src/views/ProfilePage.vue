@@ -1,14 +1,14 @@
 <template>
   <ion-page>
     <ion-content :fullscreen="true" class="ion-padding">
-      <div class="space-y-6 pb-20">
+      <div class="page-container space-y-5 pb-20">
         <!-- Page Header -->
         <div class="pt-4 px-1">
           <span class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider block">
             Pengaturan Aplikasi
           </span>
           <h1 class="text-2xl font-black text-gray-900 dark:text-white">
-            Profil & Kustomisasi
+            Profil &amp; Kustomisasi
           </h1>
         </div>
 
@@ -16,12 +16,6 @@
         <UserCard
           :name="profileStore.name"
           @update:name="handleUpdateName"
-        />
-
-        <!-- Dark Mode Toggle -->
-        <ThemeToggle
-          :dark-mode="themeStore.darkMode"
-          @toggle="handleToggleTheme"
         />
 
         <!-- Reset Button -->
@@ -57,6 +51,54 @@
             </div>
           </div>
         </BaseCard>
+
+        <!-- Logged-in User Info -->
+        <BaseCard
+          v-if="authStore.currentUser"
+          padding="md"
+          class="bg-white dark:bg-card-dark border border-gray-100 dark:border-gray-800/40"
+        >
+          <div class="flex items-center gap-3 mb-3">
+            <div class="w-9 h-9 rounded-xl bg-primary/10 dark:bg-primary/20 flex items-center justify-center">
+              <ion-icon :icon="personCircleOutline" class="text-xl text-primary" />
+            </div>
+            <div>
+              <p class="text-sm font-bold text-gray-900 dark:text-white">{{ authStore.currentUser.name }}</p>
+              <p class="text-xs text-gray-500 dark:text-gray-400">{{ authStore.currentUser.email }}</p>
+            </div>
+          </div>
+          <p class="text-[11px] text-gray-400 dark:text-gray-500 mb-3">
+            Login sejak {{ formatLoginTime(authStore.currentUser.loggedInAt) }}
+          </p>
+        </BaseCard>
+
+        <!-- Logout Button -->
+        <BaseCard
+          padding="md"
+          class="bg-white dark:bg-card-dark border border-gray-100 dark:border-gray-800/40"
+        >
+          <div class="flex items-center justify-between gap-4">
+            <div class="flex items-center gap-3.5 min-w-0">
+              <div class="bg-orange-100 dark:bg-orange-950/30 p-3 rounded-xl text-orange-600 dark:text-orange-400 flex items-center justify-center shrink-0">
+                <ion-icon :icon="logOutOutline" class="text-xl block" />
+              </div>
+              <div class="min-w-0">
+                <p class="text-sm font-bold text-gray-950 dark:text-white">Keluar Akun</p>
+                <p class="text-[11px] text-gray-500 dark:text-gray-400 font-semibold uppercase tracking-wider">
+                  Sesi login akan diakhiri
+                </p>
+              </div>
+            </div>
+            <BaseButton
+              variant="secondary"
+              size="md"
+              class="shrink-0 text-orange-600! border! border-orange-200! dark:border-orange-800/40! dark:text-orange-400!"
+              @click="promptLogout"
+            >
+              Logout
+            </BaseButton>
+          </div>
+        </BaseCard>
       </div>
 
       <!-- Reset Confirmation Modal -->
@@ -66,6 +108,15 @@
         message="Tindakan ini akan menghapus semua riwayat transaksi keuangan dan mereset profil Anda kembali ke setelan pabrik. Tindakan ini tidak dapat dibatalkan."
         @confirm="confirmReset"
         @cancel="isResetConfirmOpen = false"
+      />
+
+      <!-- Logout Confirmation Modal -->
+      <ConfirmationModal
+        :is-open="isLogoutConfirmOpen"
+        title="Keluar dari Akun?"
+        message="Anda akan keluar dari akun ini. Data transaksi Anda tetap tersimpan dan dapat diakses kembali setelah login."
+        @confirm="confirmLogout"
+        @cancel="isLogoutConfirmOpen = false"
       />
 
       <!-- Toast Messages -->
@@ -82,22 +133,25 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
 import { IonPage, IonContent, IonIcon } from "@ionic/vue";
-import { informationCircleOutline } from "ionicons/icons";
+import { informationCircleOutline, logOutOutline, personCircleOutline } from "ionicons/icons";
+import { useRouter } from "vue-router";
 import UserCard from "../components/profile/UserCard.vue";
-import ThemeToggle from "../components/profile/ThemeToggle.vue";
 import ResetDataButton from "../components/profile/ResetDataButton.vue";
 import ConfirmationModal from "../components/shared/ConfirmationModal.vue";
 import ToastMessage from "../components/shared/ToastMessage.vue";
 import BaseCard from "../components/base/BaseCard.vue";
+import BaseButton from "../components/base/BaseButton.vue";
 import { useProfileStore } from "../stores/profileStore";
-import { useThemeStore } from "../stores/themeStore";
 import { useTransactionStore } from "../stores/transactionStore";
+import { useAuthStore } from "../stores/authStore";
 
+const router = useRouter();
 const profileStore = useProfileStore();
-const themeStore = useThemeStore();
 const transactionStore = useTransactionStore();
+const authStore = useAuthStore();
 
 const isResetConfirmOpen = ref(false);
+const isLogoutConfirmOpen = ref(false);
 
 // Toast States
 const toast = ref({
@@ -115,8 +169,24 @@ const triggerToast = (message: string, color: "success" | "danger" = "success") 
 // Lifecycle
 onMounted(() => {
   profileStore.loadProfile();
-  themeStore.loadTheme();
+  authStore.loadSession();
 });
+
+// Format login time
+const formatLoginTime = (isoString: string): string => {
+  try {
+    const date = new Date(isoString);
+    return date.toLocaleString("id-ID", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  } catch {
+    return isoString;
+  }
+};
 
 // Update profile name
 const handleUpdateName = (newName: string) => {
@@ -125,17 +195,6 @@ const handleUpdateName = (newName: string) => {
     triggerToast(`Nama profil diubah menjadi "${newName}".`);
   } catch (error) {
     triggerToast("Gagal mengubah nama profil.", "danger");
-  }
-};
-
-// Toggle Theme dark/light mode
-const handleToggleTheme = () => {
-  try {
-    themeStore.toggleTheme();
-    const mode = themeStore.darkMode ? "Gelap" : "Terang";
-    triggerToast(`Tema berubah ke mode ${mode}.`);
-  } catch (error) {
-    triggerToast("Gagal mengubah tema.", "danger");
   }
 };
 
@@ -149,7 +208,6 @@ const confirmReset = () => {
   try {
     transactionStore.clearTransactions();
     profileStore.resetProfile();
-    themeStore.disableDarkMode();
     triggerToast("Data berhasil direset.");
   } catch (error) {
     triggerToast("Gagal mereset data.", "danger");
@@ -157,4 +215,29 @@ const confirmReset = () => {
     isResetConfirmOpen.value = false;
   }
 };
+
+// Logout
+const promptLogout = () => {
+  isLogoutConfirmOpen.value = true;
+};
+
+const confirmLogout = () => {
+  isLogoutConfirmOpen.value = false;
+  authStore.logout();
+  
+  // Clear stores state
+  transactionStore.transactions = [];
+  profileStore.name = "";
+  profileStore.photo = "";
+  
+  router.replace("/login");
+};
 </script>
+
+<style scoped>
+.page-container {
+  max-width: 640px;
+  margin: 0 auto;
+  width: 100%;
+}
+</style>

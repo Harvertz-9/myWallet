@@ -31,7 +31,7 @@
 import { IonIcon } from "@ionic/vue";
 import { searchOutline, closeCircleOutline } from "ionicons/icons";
 
-const props = defineProps<{
+defineProps<{
   modelValue: string;
 }>();
 

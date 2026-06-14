@@ -47,7 +47,7 @@ interface Option {
   value: string | number;
 }
 
-const props = withDefaults(
+withDefaults(
   defineProps<{
     modelValue: string | number;
     options: Option[];

@@ -1,7 +1,7 @@
 <template>
   <ion-page>
     <ion-content :fullscreen="true" class="ion-padding">
-      <div class="space-y-5 pb-20">
+      <div class="page-container space-y-4 pb-20">
         <!-- Page Header -->
         <div class="pt-4 px-1">
           <span class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider block">
@@ -13,10 +13,13 @@
         </div>
 
         <!-- Search Bar -->
-        <SearchBar v-model="searchQuery" />
+        <SearchBar v-model="searchQuery" @update:modelValue="resetPage" />
+
+        <!-- Time Filter Dropdown -->
+        <TimeFilterDropdown v-model="timeFilter" label="Filter Periode" @update:modelValue="resetPage" />
 
         <!-- Filter Chips -->
-        <FilterChip v-model="activeFilter" />
+        <FilterChip v-model="activeFilter" @update:modelValue="resetPage" />
 
         <!-- Loading Skeleton / Empty State / List -->
         <div v-if="transactionStore.loading" class="pt-4">
@@ -30,11 +33,19 @@
           />
         </div>
 
-        <div v-else class="pt-2">
+        <div v-else class="space-y-4 pt-1">
           <TransactionList
-            :transactions="filteredTransactions"
+            :transactions="paginatedTransactions"
             @edit="openEditModal"
             @delete="promptDelete"
+          />
+
+          <!-- Pagination -->
+          <Pagination
+            :current-page="currentPage"
+            :total-pages="totalPages"
+            :total-items="filteredTransactions.length"
+            @page-change="onPageChange"
           />
         </div>
       </div>
@@ -68,7 +79,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, watch } from "vue";
 import { IonPage, IonContent } from "@ionic/vue";
 import SearchBar from "../components/transaction/SearchBar.vue";
 import FilterChip from "../components/transaction/FilterChip.vue";
@@ -78,6 +89,8 @@ import EmptyState from "../components/shared/EmptyState.vue";
 import ConfirmationModal from "../components/shared/ConfirmationModal.vue";
 import EditTransactionModal from "../components/forms/EditTransactionModal.vue";
 import ToastMessage from "../components/shared/ToastMessage.vue";
+import Pagination from "../components/shared/Pagination.vue";
+import TimeFilterDropdown, { TimeFilterValue } from "../components/shared/TimeFilterDropdown.vue";
 import { useTransactionStore } from "../stores/transactionStore";
 import { Transaction } from "../types/transaction";
 
@@ -86,6 +99,11 @@ const transactionStore = useTransactionStore();
 // Filter States
 const searchQuery = ref("");
 const activeFilter = ref<"all" | "income" | "expense">("all");
+const timeFilter = ref<TimeFilterValue>("all");
+
+// Pagination
+const currentPage = ref(1);
+const itemsPerPage = 10;
 
 // Edit modal states
 const isEditModalOpen = ref(false);
@@ -113,22 +131,94 @@ onMounted(() => {
   transactionStore.loadTransactions();
 });
 
+// Helper: filter by time period
+const filterByTimePeriod = (transactions: Transaction[], period: TimeFilterValue): Transaction[] => {
+  if (period === "all") return transactions;
+  const now = new Date();
+  const startOf = (date: Date) => new Date(date.getFullYear(), date.getMonth(), date.getDate());
+
+  let fromDate: Date;
+  switch (period) {
+    case "this_month":
+      fromDate = new Date(now.getFullYear(), now.getMonth(), 1);
+      break;
+    case "last_3_months":
+      fromDate = new Date(now.getFullYear(), now.getMonth() - 2, 1);
+      break;
+    case "last_6_months":
+      fromDate = new Date(now.getFullYear(), now.getMonth() - 5, 1);
+      break;
+    case "this_year":
+      fromDate = new Date(now.getFullYear(), 0, 1);
+      break;
+    case "last_year": {
+      fromDate = new Date(now.getFullYear() - 1, 0, 1);
+      const toDate = new Date(now.getFullYear() - 1, 11, 31);
+      return transactions.filter((tx) => {
+        const d = startOf(new Date(tx.date));
+        return d >= fromDate && d <= toDate;
+      });
+    }
+    default:
+      return transactions;
+  }
+  return transactions.filter((tx) => startOf(new Date(tx.date)) >= fromDate);
+};
+
 // Reactively Filter Transactions
 const filteredTransactions = computed(() => {
-  let list = transactionStore.transactions;
+  let list = [...transactionStore.transactions];
 
-  // 1. Filter by search query (Title search)
+  // Sort newest first
+  list.sort((a, b) => {
+    const dateA = new Date(a.date).getTime();
+    const dateB = new Date(b.date).getTime();
+    if (dateB !== dateA) return dateB - dateA;
+    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+  });
+
+  // 1. Filter by time period
+  list = filterByTimePeriod(list, timeFilter.value);
+
+  // 2. Filter by search query
   if (searchQuery.value.trim()) {
     const query = searchQuery.value.toLowerCase();
-    list = list.filter((tx) => tx.title.toLowerCase().includes(query));
+    list = list.filter(
+      (tx) =>
+        tx.title.toLowerCase().includes(query) ||
+        tx.category.toLowerCase().includes(query) ||
+        (tx.note && tx.note.toLowerCase().includes(query))
+    );
   }
 
-  // 2. Filter by type (income/expense)
+  // 3. Filter by type
   if (activeFilter.value !== "all") {
     list = list.filter((tx) => tx.type === activeFilter.value);
   }
 
   return list;
+});
+
+const totalPages = computed(() =>
+  Math.max(1, Math.ceil(filteredTransactions.value.length / itemsPerPage))
+);
+
+const paginatedTransactions = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage;
+  return filteredTransactions.value.slice(start, start + itemsPerPage);
+});
+
+const resetPage = () => {
+  currentPage.value = 1;
+};
+
+const onPageChange = (page: number) => {
+  currentPage.value = page;
+};
+
+// Reset page when filters change
+watch([searchQuery, activeFilter, timeFilter], () => {
+  currentPage.value = 1;
 });
 
 // Edit handlers
@@ -163,6 +253,10 @@ const confirmDelete = () => {
     try {
       transactionStore.deleteTransaction(transactionIdToDelete.value);
       triggerToast("Transaksi berhasil dihapus.");
+      // Reset to page 1 if current page is now empty
+      if (paginatedTransactions.value.length === 0 && currentPage.value > 1) {
+        currentPage.value = currentPage.value - 1;
+      }
     } catch (error) {
       triggerToast("Gagal menghapus transaksi", "danger");
     } finally {
@@ -177,3 +271,11 @@ const cancelDelete = () => {
   isDeleteConfirmOpen.value = false;
 };
 </script>
+
+<style scoped>
+.page-container {
+  max-width: 640px;
+  margin: 0 auto;
+  width: 100%;
+}
+</style>

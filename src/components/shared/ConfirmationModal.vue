@@ -4,22 +4,24 @@
     :title="title"
     @close="$emit('cancel')"
   >
-    <div class="space-y-4">
-      <p class="text-base text-gray-600 dark:text-gray-400 leading-relaxed">
+    <div class="space-y-5">
+      <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
         {{ message }}
       </p>
-      
-      <div class="flex gap-3 justify-end mt-6">
+
+      <div class="flex gap-3 pt-2">
         <BaseButton
           variant="secondary"
-          size="sm"
+          size="md"
+          class="flex-1"
           @click="$emit('cancel')"
         >
           Batal
         </BaseButton>
         <BaseButton
           variant="danger"
-          size="sm"
+          size="md"
+          class="flex-1"
           @click="$emit('confirm')"
         >
           Ya, Lanjutkan

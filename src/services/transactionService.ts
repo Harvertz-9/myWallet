@@ -1,18 +1,22 @@
 import { storageService } from "./storageService";
 import { Transaction } from "../types/transaction";
-
-const STORAGE_KEY = "transactions";
+import { authService } from "./authService";
 
 export const transactionService = {
+  getStorageKey(): string {
+    const session = authService.getSession();
+    return session ? `transactions_${session.userId}` : "transactions";
+  },
+
   getTransactions(): Transaction[] {
-    return storageService.getItem<Transaction[]>(STORAGE_KEY, []);
+    return storageService.getItem<Transaction[]>(this.getStorageKey(), []);
   },
 
   saveTransactions(transactions: Transaction[]): void {
-    storageService.setItem<Transaction[]>(STORAGE_KEY, transactions);
+    storageService.setItem<Transaction[]>(this.getStorageKey(), transactions);
   },
 
   clearTransactions(): void {
-    storageService.removeItem(STORAGE_KEY);
+    storageService.removeItem(this.getStorageKey());
   },
 };

@@ -9,15 +9,19 @@ const DEFAULT_PROFILE: Profile = {
 };
 
 export const profileService = {
-  getProfile(): Profile {
-    return storageService.getItem<Profile>(STORAGE_KEY, DEFAULT_PROFILE);
+  getStorageKey(userId: string): string {
+    return userId ? `profile_${userId}` : STORAGE_KEY;
   },
 
-  saveProfile(profile: Profile): void {
-    storageService.setItem<Profile>(STORAGE_KEY, profile);
+  getProfile(userId: string): Profile {
+    return storageService.getItem<Profile>(this.getStorageKey(userId), DEFAULT_PROFILE);
   },
 
-  clearProfile(): void {
-    storageService.removeItem(STORAGE_KEY);
+  saveProfile(userId: string, profile: Profile): void {
+    storageService.setItem<Profile>(this.getStorageKey(userId), profile);
+  },
+
+  clearProfile(userId: string): void {
+    storageService.removeItem(this.getStorageKey(userId));
   },
 };

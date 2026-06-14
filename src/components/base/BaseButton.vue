@@ -41,24 +41,25 @@ defineEmits<{
 const variantClasses = computed(() => {
   switch (props.variant) {
     case "secondary":
-      return "bg-gray-100 hover:bg-gray-200 text-gray-800 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-100 focus:ring-gray-400";
+      return "bg-gray-100 hover:bg-gray-200 text-gray-800 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-100 focus:ring-gray-400";
     case "danger":
-      return "bg-red-500 hover:bg-red-600 text-white focus:ring-red-400";
+      return "bg-red-500 hover:bg-red-600 text-white focus:ring-red-400 shadow-sm shadow-red-500/20";
     case "primary":
     default:
-      return "bg-primary hover:bg-primary-dark text-white focus:ring-primary";
+      return "bg-primary hover:bg-primary-dark text-white focus:ring-primary shadow-sm shadow-primary/20";
   }
 });
 
 const sizeClasses = computed(() => {
   switch (props.size) {
     case "sm":
-      return "px-3 py-1.5 text-sm rounded-xl";
+      // Fixed: increased padding so button is not thin
+      return "px-4 py-2.5 text-sm rounded-full min-h-[40px]";
     case "lg":
-      return "px-6 py-3.5 text-lg rounded-2xl";
+      return "px-6 py-4 text-lg rounded-full min-h-[56px]";
     case "md":
     default:
-      return "px-5 py-3 text-base rounded-2xl";
+      return "px-6 py-3.5 text-base rounded-full min-h-[48px] w-20";
   }
 });
 

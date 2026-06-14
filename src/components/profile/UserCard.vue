@@ -14,12 +14,12 @@
     </div>
 
     <!-- Edit Name Flow -->
-    <div class="w-full flex flex-col items-center justify-center min-h-[44px]">
+    <div class="w-full flex flex-col items-center justify-center min-h-11">
       <div
         v-if="!isEditing"
         class="flex items-center gap-2"
       >
-        <h2 class="text-xl font-extrabold text-gray-900 dark:text-white truncate max-w-[180px]">
+        <h2 class="text-xl font-extrabold text-gray-900 dark:text-white truncate max-w-45">
           {{ name }}
         </h2>
         <button
@@ -33,7 +33,7 @@
       
       <div
         v-else
-        class="flex items-center gap-2 w-full max-w-[200px]"
+        class="flex items-center gap-2 w-full max-w-50"
       >
         <input
           ref="inputRef"
@@ -46,7 +46,7 @@
         />
         <button
           type="button"
-          class="bg-primary text-white p-2 rounded-xl btn-press cursor-pointer flex items-center justify-center shadow-md shadow-primary/20 shrink-0"
+          class="bg-primary text-white p-2 rounded-full btn-press cursor-pointer flex items-center justify-center shadow-md shadow-primary/20 shrink-0"
           @mousedown.prevent="saveName"
         >
           <ion-icon :icon="checkmarkOutline" class="text-sm block font-extrabold" />

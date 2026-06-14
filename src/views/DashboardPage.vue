@@ -1,7 +1,7 @@
 <template>
   <ion-page>
     <ion-content :fullscreen="true" class="ion-padding">
-      <div class="space-y-6 pb-24">
+      <div class="page-container space-y-6 pb-28">
         <!-- Header Profile Greeting -->
         <div class="flex items-center justify-between pt-4 px-1">
           <div>
@@ -15,7 +15,7 @@
           <!-- Avatar Clickable -> Navigates to Profile -->
           <router-link
             to="/tabs/profile"
-            class="w-11 h-11 rounded-2xl bg-primary/10 text-primary dark:bg-primary/5 flex items-center justify-center text-lg font-bold border border-primary/10 shadow-sm"
+            class="w-11 h-11 rounded-2xl bg-primary/10 text-primary dark:bg-primary/5 dark:text-primary-tint flex items-center justify-center text-lg font-bold border border-primary/20 shadow-sm hover:scale-105 transition-transform"
           >
             {{ profileStore.name.charAt(0).toUpperCase() }}
           </router-link>
@@ -30,11 +30,34 @@
           <ExpenseCard :expense="transactionStore.totalExpense" />
         </div>
 
-        <!-- Recent Transactions -->
-        <RecentTransactions
-          :transactions="transactionStore.recentTransactions"
-          @select="openEditModal"
-        />
+        <!-- Loading Skeleton -->
+        <div v-if="transactionStore.loading">
+          <LoadingSkeleton type="list" :count="4" />
+        </div>
+
+        <!-- Empty State -->
+        <div v-else-if="transactionStore.transactions.length === 0" class="pt-2">
+          <EmptyState
+            title="Belum Ada Transaksi"
+            description="Tap tombol + di bawah untuk menambahkan transaksi pertama Anda."
+          />
+        </div>
+
+        <!-- Transaction List with Pagination -->
+        <div v-else class="space-y-4">
+          <RecentTransactions
+            :transactions="paginatedTransactions"
+            @select="openEditModal"
+          />
+
+          <!-- Pagination -->
+          <Pagination
+            :current-page="currentPage"
+            :total-pages="totalPages"
+            :total-items="transactionStore.transactions.length"
+            @page-change="onPageChange"
+          />
+        </div>
       </div>
 
       <!-- Add FAB -->
@@ -77,6 +100,9 @@ import FloatingActionButton from "../components/shared/FloatingActionButton.vue"
 import AddTransactionModal from "../components/forms/AddTransactionModal.vue";
 import EditTransactionModal from "../components/forms/EditTransactionModal.vue";
 import ToastMessage from "../components/shared/ToastMessage.vue";
+import LoadingSkeleton from "../components/shared/LoadingSkeleton.vue";
+import EmptyState from "../components/shared/EmptyState.vue";
+import Pagination from "../components/shared/Pagination.vue";
 import { useTransactionStore } from "../stores/transactionStore";
 import { useProfileStore } from "../stores/profileStore";
 import { Transaction } from "../types/transaction";
@@ -89,6 +115,10 @@ const profileStore = useProfileStore();
 const isAddModalOpen = ref(false);
 const isEditModalOpen = ref(false);
 const selectedTransaction = ref<Transaction | null>(null);
+
+// Pagination
+const currentPage = ref(1);
+const itemsPerPage = 5;
 
 // Toast States
 const toast = ref({
@@ -108,6 +138,29 @@ onMounted(() => {
   transactionStore.loadTransactions();
   profileStore.loadProfile();
 });
+
+// Sorted transactions (newest first)
+const sortedTransactions = computed(() => {
+  return [...transactionStore.transactions].sort((a, b) => {
+    const dateA = new Date(a.date).getTime();
+    const dateB = new Date(b.date).getTime();
+    if (dateB !== dateA) return dateB - dateA;
+    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+  });
+});
+
+const totalPages = computed(() =>
+  Math.max(1, Math.ceil(sortedTransactions.value.length / itemsPerPage))
+);
+
+const paginatedTransactions = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage;
+  return sortedTransactions.value.slice(start, start + itemsPerPage);
+});
+
+const onPageChange = (page: number) => {
+  currentPage.value = page;
+};
 
 // Dynamic Greeting based on current hour
 const greeting = computed(() => {
@@ -131,6 +184,7 @@ const handleAddTransaction = (newTx: Transaction) => {
   try {
     transactionStore.addTransaction(newTx);
     isAddModalOpen.value = false;
+    currentPage.value = 1;
     triggerToast("Transaksi berhasil ditambahkan.");
   } catch (error) {
     triggerToast("Gagal menyimpan transaksi", "danger");
@@ -157,3 +211,11 @@ const handleUpdateTransaction = (updatedTx: Transaction) => {
   }
 };
 </script>
+
+<style scoped>
+.page-container {
+  max-width: 640px;
+  margin: 0 auto;
+  width: 100%;
+}
+</style>

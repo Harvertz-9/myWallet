@@ -4,11 +4,11 @@
       v-for="filter in filters"
       :key="filter.value"
       type="button"
-      class="px-5 py-2.5 text-xs font-bold rounded-full transition-all duration-200 cursor-pointer whitespace-nowrap btn-press border"
+      class="px-6 py-3 text-sm font-bold rounded-full transition-all duration-200 cursor-pointer whitespace-nowrap btn-press border min-h-11"
       :class="[
         modelValue === filter.value
-          ? 'bg-primary text-white border-primary shadow-sm shadow-primary/30'
-          : 'bg-white dark:bg-card-dark text-gray-600 dark:text-gray-400 border-gray-100 dark:border-gray-800/40 hover:bg-gray-50 dark:hover:bg-gray-800'
+          ? 'bg-primary text-white border-primary shadow-md shadow-primary/25'
+          : 'bg-white dark:bg-card-dark text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
       ]"
       @click="selectFilter(filter.value)"
     >
@@ -18,7 +18,7 @@
 </template>
 
 <script setup lang="ts">
-const props = withDefaults(
+withDefaults(
   defineProps<{
     modelValue: "all" | "income" | "expense";
   }>(),
@@ -33,9 +33,9 @@ const emit = defineEmits<{
 }>();
 
 const filters = [
-  { label: "Semua 🗓️", value: "all" as const },
-  { label: "Pemasukan 🟢", value: "income" as const },
-  { label: "Pengeluaran 🔴", value: "expense" as const },
+  { label: "Semua", value: "all" as const },
+  { label: "Pemasukan", value: "income" as const },
+  { label: "Pengeluaran", value: "expense" as const },
 ];
 
 const selectFilter = (val: "all" | "income" | "expense") => {

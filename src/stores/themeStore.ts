@@ -8,10 +8,14 @@ export const useThemeStore = defineStore("theme", () => {
   // Getters
   const isDarkMode = computed(() => darkMode.value);
 
-  // Helper to apply theme to document
+  // Apply theme to both <html> and <body> for maximum compatibility
   function applyTheme(isDark: boolean) {
+    // Apply to <html> — needed for Ionic dark.class.css
     document.documentElement.classList.toggle("dark", isDark);
+    // Apply to <body> — needed for Tailwind utilities
     document.body.classList.toggle("dark", isDark);
+    // Set color-scheme for native form elements
+    document.documentElement.style.colorScheme = isDark ? "dark" : "light";
   }
 
   // Actions

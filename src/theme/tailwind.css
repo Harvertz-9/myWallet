@@ -3,13 +3,14 @@
 @theme {
   --color-primary: #10B981;
   --color-primary-dark: #059669;
+  --color-primary-tint: #34d399;
   --color-income: #22C55E;
   --color-expense: #EF4444;
-  
+
   --color-bg-light: #F9FAFB;
   --color-bg-dark: #111827;
   --color-card-dark: #1F2937;
-  
+
   --radius-card: 20px;
   --radius-button: 16px;
   --radius-input: 16px;
@@ -29,20 +30,71 @@
   to { opacity: 1; }
 }
 
-/* Custom Base Styles */
+/* ===========================
+   Base / Reset
+   =========================== */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/* ===========================
+   Base — Always Dark
+   =========================== */
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  background-color: var(--color-bg-light);
-  color: #111827;
-  transition: background-color 0.2s ease, color 0.2s ease;
-}
-
-body.dark {
   background-color: var(--color-bg-dark);
   color: #F9FAFB;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color-scheme: dark;
 }
 
-/* Glassmorphism utility */
+/* Ionic component overrides — always dark */
+ion-content,
+ion-page,
+ion-header,
+ion-toolbar,
+ion-item,
+ion-list {
+  --background: var(--color-bg-dark) !important;
+  --ion-background-color: var(--color-bg-dark) !important;
+  --color: #F9FAFB !important;
+}
+
+ion-tab-bar {
+  --background: #1F2937 !important;
+  --border-color: #374151 !important;
+  --color: #9CA3AF;
+  --color-selected: #10B981;
+}
+
+ion-segment {
+  --background: #1F2937;
+}
+
+ion-segment-button {
+  --color: #9CA3AF;
+  --color-checked: #10B981;
+  --background-checked: #111827;
+}
+
+ion-toggle {
+  --background: #374151;
+  --background-checked: #10B981;
+}
+
+select,
+input[type="date"],
+input[type="number"],
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+  color-scheme: dark;
+}
+
+/* ===========================
+   Glassmorphism utility
+   =========================== */
 .glass-panel {
   background: rgba(255, 255, 255, 0.7);
   backdrop-filter: blur(12px);
@@ -50,6 +102,7 @@ body.dark {
   border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
+html.dark .glass-panel,
 .dark .glass-panel {
   background: rgba(31, 41, 55, 0.7);
   backdrop-filter: blur(12px);
@@ -57,7 +110,9 @@ body.dark {
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-/* Custom Card & Shadows */
+/* ===========================
+   Custom Card & Shadows
+   =========================== */
 .custom-card {
   border-radius: var(--radius-card);
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
@@ -68,7 +123,9 @@ body.dark {
   transform: scale(0.98);
 }
 
-/* Hide scrollbars but keep scrolling */
+/* ===========================
+   Scrollbar Utilities
+   =========================== */
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
@@ -77,21 +134,70 @@ body.dark {
   scrollbar-width: none;
 }
 
-/* Ionic Component overrides to respect dark mode */
-.dark ion-content, 
-.dark ion-page, 
-.dark ion-header, 
-.dark ion-toolbar,
-.dark ion-item,
-.dark ion-list,
-.dark ion-tab-bar {
-  --background: var(--color-bg-dark) !important;
-  --ion-background-color: var(--color-bg-dark) !important;
-  --color: #F9FAFB !important;
-}
-
-/* Smooth active button state */
+/* ===========================
+   Button Press Effect
+   =========================== */
 .btn-press:active {
   transform: scale(0.96);
   opacity: 0.9;
+}
+
+/* ===========================
+   Responsive Utilities
+   =========================== */
+
+
+/* Responsive page wrapper — used in all main views */
+.page-container {
+  width: 100%;
+  max-width: 640px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Responsive grid fixes */
+@media (min-width: 480px) {
+  .responsive-grid-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 640px) {
+  .responsive-grid-3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ===========================
+   Input Dark Mode Fixes
+   =========================== */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="date"],
+textarea,
+select {
+  transition: border-color 0.2s, background-color 0.2s, box-shadow 0.2s;
+}
+
+html.dark input[type="date"],
+.dark input[type="date"] {
+  color-scheme: dark;
+}
+
+/* ===========================
+   Auth page — responsive
+   =========================== */
+@media (max-width: 360px) {
+  .auth-card {
+    padding: 24px 18px !important;
+  }
+}
+
+/* ===========================
+   Transition Utilities
+   =========================== */
+.fade-transition {
+  transition: opacity 0.25s ease, transform 0.25s ease;
 }
