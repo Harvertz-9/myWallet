@@ -1,7 +1,7 @@
 <template>
   <BaseCard
     padding="md"
-    class="bg-white dark:bg-card-dark"
+    class="bg-white dark:bg-card-dark border border-gray-100 dark:border-gray-800/40"
   >
     <h3 class="text-sm font-bold text-gray-900 dark:text-gray-100 mb-4 px-1">
       Kategori Pengeluaran
@@ -20,16 +20,40 @@
       </p>
     </div>
 
-    <!-- Render Pie Chart -->
+    <!-- Render Pie Chart with Custom Legend -->
     <div
       v-else
-      class="relative flex justify-center items-center min-h-[220px] w-full"
+      class="flex flex-col sm:flex-row items-center gap-6 py-2 w-full"
     >
-      <div class="w-full max-w-[220px]">
+      <!-- Chart Canvas Wrapper -->
+      <div class="relative w-full max-w-[160px] h-[160px] flex-shrink-0 flex justify-center items-center">
         <Pie
           :data="chartData"
           :options="chartOptions"
         />
+      </div>
+
+      <!-- Custom Responsive Legend -->
+      <div class="flex-1 w-full grid grid-cols-2 gap-2 sm:gap-3">
+        <div
+          v-for="item in legendItems"
+          :key="item.label"
+          class="flex items-center gap-2.5 text-xs font-semibold text-gray-700 dark:text-gray-300 min-w-0"
+        >
+          <!-- Color Dot -->
+          <span
+            class="w-3 h-3 rounded-full flex-shrink-0 shadow-sm"
+            :style="{ backgroundColor: item.color }"
+          ></span>
+          
+          <!-- Details (Name, %, Amount) -->
+          <div class="truncate flex-1 min-w-0 leading-tight">
+            <div class="truncate text-gray-850 dark:text-gray-200">{{ item.label }}</div>
+            <div class="text-[10px] text-gray-400 dark:text-gray-500 font-medium">
+              {{ item.percentage }}% • {{ item.formattedAmount }}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </BaseCard>
@@ -43,6 +67,7 @@ import { pieChartOutline } from "ionicons/icons";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, Title } from "chart.js";
 import BaseCard from "../base/BaseCard.vue";
 import { Transaction } from "../../types/transaction";
+import { formatRupiah } from "../../utils/currencyFormatter";
 
 ChartJS.register(ArcElement, Tooltip, Legend, Title);
 
@@ -72,6 +97,32 @@ const categoryColors: Record<string, string> = {
   Others: "#9CA3AF",           // Gray
 };
 
+// Custom Legend Items
+const legendItems = computed(() => {
+  const expenses = props.transactions.filter((t) => t.type === "expense");
+  
+  // Aggregate expenses by category
+  const aggregated: Record<string, number> = {};
+  let total = 0;
+  expenses.forEach((t) => {
+    const cat = t.category;
+    aggregated[cat] = (aggregated[cat] || 0) + t.amount;
+    total += t.amount;
+  });
+
+  return Object.keys(aggregated).map((cat) => {
+    const amount = aggregated[cat];
+    const percentage = total > 0 ? Math.round((amount / total) * 100) : 0;
+    return {
+      label: categoryLabelMap[cat] || cat,
+      color: categoryColors[cat] || "#D1D5DB",
+      amount,
+      percentage,
+      formattedAmount: formatRupiah(amount),
+    };
+  }).sort((a, b) => b.amount - a.amount); // Sort by highest expense first
+});
+
 const chartData = computed(() => {
   const expenses = props.transactions.filter((t) => t.type === "expense");
   
@@ -87,7 +138,6 @@ const chartData = computed(() => {
   const labels = categories.map((c) => categoryLabelMap[c] || c);
   const backgroundColor = categories.map((c) => categoryColors[c] || "#D1D5DB");
 
-  // If no expenses, chartData will have empty dataset
   if (data.length === 0) {
     return {
       labels: [],
@@ -118,18 +168,7 @@ const chartOptions = computed(() => ({
   maintainAspectRatio: false,
   plugins: {
     legend: {
-      position: "bottom" as const,
-      labels: {
-        usePointStyle: true,
-        pointStyle: "circle",
-        padding: 12,
-        font: {
-          family: "'Inter', sans-serif",
-          size: 10,
-          weight: "bold" as const,
-        },
-        color: document.body.classList.contains("dark") ? "#9CA3AF" : "#4B5563",
-      },
+      display: false, // HIDE standard ChartJS legend
     },
     tooltip: {
       callbacks: {
@@ -148,3 +187,7 @@ const chartOptions = computed(() => ({
   },
 }));
 </script>
+
+<style scoped>
+/* Scoped styles */
+</style>

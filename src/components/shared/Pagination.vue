@@ -7,14 +7,13 @@
     <button
       type="button"
       :disabled="currentPage <= 1"
-      class="flex items-center gap-1.5 px-4 py-2.5 text-sm font-semibold rounded-full border transition-all duration-200 min-h-[40px] disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+      class="w-9 h-9 flex items-center justify-center rounded-full border transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer shrink-0"
       :class="currentPage > 1
         ? 'bg-white dark:bg-card-dark border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700'
         : 'bg-gray-50 dark:bg-gray-800 border-gray-100 dark:border-gray-800 text-gray-400'"
       @click="$emit('page-change', currentPage - 1)"
     >
       <ion-icon :icon="chevronBackOutline" class="text-base" />
-      Prev
     </button>
 
     <!-- Page Info -->
@@ -44,13 +43,12 @@
     <button
       type="button"
       :disabled="currentPage >= totalPages"
-      class="flex items-center gap-1.5 px-4 py-2.5 text-sm font-semibold rounded-full border transition-all duration-200 min-h-[40px] disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+      class="w-9 h-9 flex items-center justify-center rounded-full border transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer shrink-0"
       :class="currentPage < totalPages
         ? 'bg-white dark:bg-card-dark border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700'
         : 'bg-gray-50 dark:bg-gray-800 border-gray-100 dark:border-gray-800 text-gray-400'"
       @click="$emit('page-change', currentPage + 1)"
     >
-      Next
       <ion-icon :icon="chevronForwardOutline" class="text-base" />
     </button>
   </div>

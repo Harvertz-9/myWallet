@@ -36,6 +36,7 @@
         <div v-else class="space-y-4 pt-1">
           <TransactionList
             :transactions="paginatedTransactions"
+            @click="openEditModal"
             @edit="openEditModal"
             @delete="promptDelete"
           />
@@ -183,12 +184,29 @@ const filteredTransactions = computed(() => {
   // 2. Filter by search query
   if (searchQuery.value.trim()) {
     const query = searchQuery.value.toLowerCase();
-    list = list.filter(
-      (tx) =>
-        tx.title.toLowerCase().includes(query) ||
-        tx.category.toLowerCase().includes(query) ||
-        (tx.note && tx.note.toLowerCase().includes(query))
-    );
+    const categoryLabelMap: Record<string, string> = {
+      Salary: "gaji",
+      Bonus: "bonus",
+      Freelance: "freelance",
+      Investment: "investasi",
+      Gift: "hadiah",
+      Food: "makanan",
+      Transportation: "transportasi",
+      Shopping: "belanja",
+      Entertainment: "hiburan",
+      Education: "pendidikan",
+      Health: "kesehatan",
+      Bills: "tagihan",
+      Others: "lainnya",
+    };
+    list = list.filter((tx) => {
+      const titleMatch = tx.title.toLowerCase().includes(query);
+      const categoryEnglishMatch = tx.category.toLowerCase().includes(query);
+      const indonesianCategory = categoryLabelMap[tx.category] || tx.category.toLowerCase();
+      const categoryIndonesianMatch = indonesianCategory.includes(query);
+      const noteMatch = tx.note ? tx.note.toLowerCase().includes(query) : false;
+      return titleMatch || categoryEnglishMatch || categoryIndonesianMatch || noteMatch;
+    });
   }
 
   // 3. Filter by type

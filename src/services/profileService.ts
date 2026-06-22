@@ -4,7 +4,7 @@ import { Profile } from "../types/profile";
 const STORAGE_KEY = "profile";
 
 const DEFAULT_PROFILE: Profile = {
-  name: "Bryan",
+  name: "",
   photo: "",
 };
 

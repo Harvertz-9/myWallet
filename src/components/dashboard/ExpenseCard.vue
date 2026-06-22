@@ -1,7 +1,7 @@
 <template>
   <BaseCard
     padding="md"
-    class="bg-white dark:bg-card-dark flex items-center gap-3.5"
+    class="bg-white dark:bg-card-dark flex items-center gap-2.5 sm:gap-3.5"
   >
     <div class="bg-red-100 dark:bg-red-950/30 p-3 rounded-2xl text-red-600 dark:text-red-400 flex items-center justify-center">
       <ion-icon

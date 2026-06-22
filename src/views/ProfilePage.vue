@@ -15,42 +15,12 @@
         <!-- User Profile Card -->
         <UserCard
           :name="profileStore.name"
-          @update:name="handleUpdateName"
+          :photo="profileStore.photo"
+          :occupation="profileStore.occupation"
         />
 
         <!-- Reset Button -->
         <ResetDataButton @reset="promptReset" />
-
-        <!-- App Information Card -->
-        <BaseCard
-          padding="md"
-          class="bg-white dark:bg-card-dark border border-gray-100 dark:border-gray-800/40"
-        >
-          <h3 class="text-sm font-bold text-gray-950 dark:text-white mb-3 flex items-center gap-1.5">
-            <ion-icon :icon="informationCircleOutline" class="text-lg text-primary" />
-            Tentang Aplikasi
-          </h3>
-          <div class="space-y-2.5 text-xs text-gray-600 dark:text-gray-400">
-            <div class="flex justify-between font-medium">
-              <span>Nama Aplikasi</span>
-              <span class="font-bold text-gray-900 dark:text-white">MyWallet</span>
-            </div>
-            <div class="flex justify-between font-medium">
-              <span>Versi</span>
-              <span class="font-bold text-gray-900 dark:text-white">1.0 (MVP)</span>
-            </div>
-            <div class="flex justify-between font-medium">
-              <span>Developer</span>
-              <span class="font-bold text-gray-900 dark:text-white">Antigravity AI</span>
-            </div>
-            <div class="border-t border-gray-100 dark:border-gray-800 pt-2.5 mt-1">
-              <p class="font-semibold text-gray-900 dark:text-white mb-1">Teknologi:</p>
-              <p class="text-[10px] leading-relaxed text-gray-500">
-                Ionic Vue, TypeScript, Pinia State Management, TailwindCSS, Chart.js, LocalStorage.
-              </p>
-            </div>
-          </div>
-        </BaseCard>
 
         <!-- Logged-in User Info -->
         <BaseCard
@@ -133,7 +103,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
 import { IonPage, IonContent, IonIcon } from "@ionic/vue";
-import { informationCircleOutline, logOutOutline, personCircleOutline } from "ionicons/icons";
+import { logOutOutline, personCircleOutline } from "ionicons/icons";
 import { useRouter } from "vue-router";
 import UserCard from "../components/profile/UserCard.vue";
 import ResetDataButton from "../components/profile/ResetDataButton.vue";
@@ -188,15 +158,7 @@ const formatLoginTime = (isoString: string): string => {
   }
 };
 
-// Update profile name
-const handleUpdateName = (newName: string) => {
-  try {
-    profileStore.setName(newName);
-    triggerToast(`Nama profil diubah menjadi "${newName}".`);
-  } catch (error) {
-    triggerToast("Gagal mengubah nama profil.", "danger");
-  }
-};
+
 
 // Reset Prompt
 const promptReset = () => {

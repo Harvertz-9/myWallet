@@ -21,6 +21,7 @@
           v-for="tx in group.items"
           :key="tx.id"
           :transaction="tx"
+          @click="$emit('click', $event)"
           @edit="$emit('edit', $event)"
           @delete="$emit('delete', $event)"
         />
@@ -41,6 +42,7 @@ const props = defineProps<{
 }>();
 
 defineEmits<{
+  (e: "click", tx: Transaction): void;
   (e: "edit", tx: Transaction): void;
   (e: "delete", id: string): void;
 }>();

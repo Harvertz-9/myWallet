@@ -3,21 +3,22 @@
     <ion-content :fullscreen="true" class="ion-padding">
       <div class="page-container space-y-6 pb-28">
         <!-- Header Profile Greeting -->
-        <div class="flex items-center justify-between pt-4 px-1">
+        <div class="flex items-center justify-between pt-5 pb-2 px-1">
           <div>
-            <span class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider block">
+            <span class="text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider block mb-1">
               {{ todayString }}
             </span>
-            <h1 class="text-2xl font-black text-gray-900 dark:text-white">
-              {{ greeting }}, {{ profileStore.name }}!
+            <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-gray-950 dark:text-white">
+              {{ greeting }}, <span class="text-primary dark:text-primary-tint font-extrabold">{{ profileStore.name }}</span>!
             </h1>
           </div>
           <!-- Avatar Clickable -> Navigates to Profile -->
           <router-link
             to="/tabs/profile"
-            class="w-11 h-11 rounded-2xl bg-primary/10 text-primary dark:bg-primary/5 dark:text-primary-tint flex items-center justify-center text-lg font-bold border border-primary/20 shadow-sm hover:scale-105 transition-transform"
+            class="w-11 h-11 rounded-full bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary-tint flex items-center justify-center text-xl shadow-sm hover:scale-105 transition-transform shrink-0 border border-primary/15"
           >
-            {{ profileStore.name.charAt(0).toUpperCase() }}
+            <span v-if="profileStore.photo">{{ profileStore.photo }}</span>
+            <span v-else class="font-extrabold">{{ profileStore.name ? profileStore.name.charAt(0).toUpperCase() : 'P' }}</span>
           </router-link>
         </div>
 
@@ -25,7 +26,7 @@
         <BalanceCard :balance="transactionStore.balance" />
 
         <!-- Income & Expense Summary Grid -->
-        <div class="grid grid-cols-2 gap-3">
+        <div class="grid grid-cols-1 min-[400px]:grid-cols-2 gap-3">
           <IncomeCard :income="transactionStore.totalIncome" />
           <ExpenseCard :expense="transactionStore.totalExpense" />
         </div>
