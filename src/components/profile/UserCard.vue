@@ -13,9 +13,6 @@
         <span v-else-if="photo">{{ photo }}</span>
         <span v-else>{{ name ? name.charAt(0).toUpperCase() : 'P' }}</span>
       </div>
-      <div class="absolute bottom-0 right-0 bg-primary text-white p-1 rounded-full border-2 border-white dark:border-card-dark">
-        <ion-icon :icon="personCircleOutline" class="text-xs block" />
-      </div>
     </div>
 
     <!-- Profile Details -->

@@ -43,6 +43,25 @@
         </div>
       </BaseCard>
 
+      <!-- Rata-rata Pemasukan -->
+      <BaseCard
+        padding="sm"
+        class="bg-white dark:bg-card-dark flex flex-col justify-between min-h-[90px]"
+      >
+        <div class="flex items-center justify-between text-gray-400 dark:text-gray-500 mb-1">
+          <span class="text-[10px] font-bold uppercase tracking-wider">Rata-rata Masuk</span>
+          <ion-icon :icon="trendingUpOutline" class="text-lg text-green-500" />
+        </div>
+        <div>
+          <h4 class="text-lg font-extrabold text-green-600 dark:text-green-400">
+            {{ formattedAverageIncome }}
+          </h4>
+          <p class="text-[10px] text-gray-400 dark:text-gray-500 font-medium mt-0.5">
+            Per transaksi
+          </p>
+        </div>
+      </BaseCard>
+
       <!-- Pengeluaran Terbesar -->
       <BaseCard
         padding="sm"
@@ -151,6 +170,15 @@ const formattedAverageExpense = computed(() => {
   if (expenses.length === 0) return "Rp0";
   const sum = expenses.reduce((acc, t) => acc + t.amount, 0);
   const avg = Math.round(sum / expenses.length);
+  return formatRupiah(avg);
+});
+
+// Average Income
+const formattedAverageIncome = computed(() => {
+  const incomes = props.transactions.filter((t) => t.type === "income");
+  if (incomes.length === 0) return "Rp0";
+  const sum = incomes.reduce((acc, t) => acc + t.amount, 0);
+  const avg = Math.round(sum / incomes.length);
   return formatRupiah(avg);
 });
 </script>

@@ -51,6 +51,11 @@ const { t } = useI18n();
 ion-tab-bar {
   --border: 1px solid rgba(0, 0, 0, 0.05);
   height: 64px;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
 }
 .dark ion-tab-bar {
   --border: 1px solid rgba(255, 255, 255, 0.05);

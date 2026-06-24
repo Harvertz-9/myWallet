@@ -3,20 +3,6 @@
     ref="slidingRef"
     class="custom-sliding-item mb-3 rounded-2xl overflow-hidden"
   >
-    <!-- Left options (Swipe to right) → Edit -->
-    <ion-item-options side="start" @ionSwipe="handleEdit">
-      <ion-item-option
-        color="warning"
-        expandable
-        class="font-bold flex items-center justify-center gap-1 cursor-pointer"
-        @click="handleEdit"
-      >
-        <ion-icon
-          :icon="createOutline"
-          slot="icon-only"
-        />
-      </ion-item-option>
-    </ion-item-options>
 
     <!-- Transaction Main Item -->
     <ion-item
@@ -65,8 +51,18 @@
       </div>
     </ion-item>
 
-    <!-- Right options (Swipe to left) → Delete -->
+    <!-- Right options (Swipe to left) → Edit + Delete -->
     <ion-item-options side="end" @ionSwipe="handleDelete">
+      <ion-item-option
+        color="warning"
+        class="font-bold flex items-center justify-center gap-1 cursor-pointer"
+        @click="handleEdit"
+      >
+        <ion-icon
+          :icon="createOutline"
+          slot="icon-only"
+        />
+      </ion-item-option>
       <ion-item-option
         color="danger"
         expandable

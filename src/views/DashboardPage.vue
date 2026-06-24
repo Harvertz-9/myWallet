@@ -23,9 +23,6 @@
             <img v-if="profileStore.photo && profileStore.photo.startsWith('data:image')" :src="profileStore.photo" class="w-full h-full object-cover" />
             <span v-else-if="profileStore.photo">{{ profileStore.photo }}</span>
             <span v-else class="font-extrabold">{{ profileStore.name ? profileStore.name.charAt(0).toUpperCase() : 'P' }}</span>
-            
-            <!-- Online status indicator -->
-            <div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white dark:border-gray-900 rounded-full"></div>
           </router-link>
         </div>
 
@@ -56,6 +53,8 @@
           <RecentTransactions
             :transactions="paginatedTransactions"
             @select="openEditModal"
+            @edit="openEditModal"
+            @delete="promptDelete"
           />
 
           <!-- Pagination -->
@@ -86,6 +85,15 @@
         @update="handleUpdateTransaction"
       />
 
+      <!-- Delete Confirmation Modal -->
+      <ConfirmationModal
+        :is-open="isDeleteConfirmOpen"
+        :title="'Hapus Transaksi'"
+        :message="'Yakin ingin menghapus transaksi ini?'"
+        @confirm="confirmDelete"
+        @cancel="cancelDelete"
+      />
+
       <!-- Toast Feedbacks -->
       <ToastMessage
         :is-open="toast.show"
@@ -107,6 +115,7 @@ import RecentTransactions from "../components/dashboard/RecentTransactions.vue";
 import FloatingActionButton from "../components/shared/FloatingActionButton.vue";
 import AddTransactionModal from "../components/forms/AddTransactionModal.vue";
 import EditTransactionModal from "../components/forms/EditTransactionModal.vue";
+import ConfirmationModal from "../components/shared/ConfirmationModal.vue";
 import ToastMessage from "../components/shared/ToastMessage.vue";
 import LoadingSkeleton from "../components/shared/LoadingSkeleton.vue";
 import EmptyState from "../components/shared/EmptyState.vue";
@@ -125,6 +134,10 @@ const { t } = useI18n();
 const isAddModalOpen = ref(false);
 const isEditModalOpen = ref(false);
 const selectedTransaction = ref<Transaction | null>(null);
+
+// Delete modal states
+const isDeleteConfirmOpen = ref(false);
+const transactionIdToDelete = ref<string | null>(null);
 
 // Pagination
 const currentPage = ref(1);
@@ -219,6 +232,34 @@ const handleUpdateTransaction = (updatedTx: Transaction) => {
   } catch (error) {
     triggerToast(t('dashboard.toast_update_fail'), "danger");
   }
+};
+
+// Delete handlers
+const promptDelete = (id: string) => {
+  transactionIdToDelete.value = id;
+  isDeleteConfirmOpen.value = true;
+};
+
+const confirmDelete = () => {
+  if (transactionIdToDelete.value) {
+    try {
+      transactionStore.deleteTransaction(transactionIdToDelete.value);
+      triggerToast('Transaksi berhasil dihapus');
+      if (paginatedTransactions.value.length === 0 && currentPage.value > 1) {
+        currentPage.value = currentPage.value - 1;
+      }
+    } catch (error) {
+      triggerToast('Gagal menghapus transaksi', "danger");
+    } finally {
+      transactionIdToDelete.value = null;
+      isDeleteConfirmOpen.value = false;
+    }
+  }
+};
+
+const cancelDelete = () => {
+  transactionIdToDelete.value = null;
+  isDeleteConfirmOpen.value = false;
 };
 </script>
 

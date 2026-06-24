@@ -1,10 +1,25 @@
-import { mount } from '@vue/test-utils'
-import Tab1Page from '@/views/Tab1Page.vue'
-import { describe, expect, test } from 'vitest'
+import { describe, expect, test } from "vitest";
+import { formatRupiah } from "@/utils/currencyFormatter";
+import { formatDate, formatDateTime } from "@/utils/dateFormatter";
 
-describe('Tab1Page.vue', () => {
-  test('renders tab 1 Tab1Page', () => {
-    const wrapper = mount(Tab1Page)
-    expect(wrapper.text()).toMatch('Tab 1 page')
-  })
-})
+describe("currencyFormatter", () => {
+  test("formats number to Rupiah without decimals and spacing", () => {
+    expect(formatRupiah(100000)).toBe("Rp100.000");
+    expect(formatRupiah(0)).toBe("Rp0");
+  });
+
+  test("handles NaN gracefully", () => {
+    expect(formatRupiah(NaN)).toBe("Rp0");
+  });
+});
+
+describe("dateFormatter", () => {
+  test("formats YYYY-MM-DD date string to Indonesian long date format", () => {
+    expect(formatDate("2026-06-24")).toBe("24 Juni 2026");
+  });
+
+  test("returns empty string when input is empty", () => {
+    expect(formatDate("")).toBe("");
+  });
+});
+

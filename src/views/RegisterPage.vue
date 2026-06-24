@@ -43,7 +43,7 @@
                 <input
                   v-model="email"
                   type="email"
-                  placeholder="email@contoh.com"
+                  placeholder="contoh@gmail.com"
                   class="auth-input"
                   autocomplete="email"
                   @input="errors.email = ''"
@@ -60,9 +60,10 @@
                 <input
                   v-model="password"
                   :type="showPassword ? 'text' : 'password'"
-                  placeholder="Min. 6 karakter"
+                  placeholder="Min. 6, maks. 10 karakter"
                   class="auth-input"
                   autocomplete="new-password"
+                  maxlength="10"
                   @input="errors.password = ''"
                 />
                 <button
@@ -192,7 +193,10 @@ const validate = (): boolean => {
   if (!email.value.trim()) {
     errors.value.email = "Email tidak boleh kosong";
     valid = false;
-  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) {
+  } else if (!email.value.toLowerCase().endsWith('@gmail.com')) {
+    errors.value.email = "Email harus menggunakan format @gmail.com";
+    valid = false;
+  } else if (!/^[^\s@]+@gmail\.com$/.test(email.value.toLowerCase())) {
     errors.value.email = "Format email tidak valid";
     valid = false;
   }
@@ -202,6 +206,9 @@ const validate = (): boolean => {
     valid = false;
   } else if (password.value.length < 6) {
     errors.value.password = "Kata sandi minimal 6 karakter";
+    valid = false;
+  } else if (password.value.length > 10) {
+    errors.value.password = "Kata sandi maksimal 10 karakter";
     valid = false;
   }
 

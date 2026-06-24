@@ -107,6 +107,9 @@
           <!-- Pie Chart (Expense Categories) -->
           <ExpensePieChart :transactions="filteredTransactions" />
 
+          <!-- Pie Chart (Income Categories) -->
+          <IncomePieChart :transactions="filteredTransactions" />
+
           <!-- Financial Summary Insights -->
           <StatisticsSummary :transactions="filteredTransactions" />
         </div>
@@ -121,6 +124,7 @@ import { IonPage, IonContent, IonIcon } from "@ionic/vue";
 import { pieChartOutline } from "ionicons/icons";
 import IncomeExpenseBarChart from "../components/statistics/IncomeExpenseBarChart.vue";
 import ExpensePieChart from "../components/statistics/ExpensePieChart.vue";
+import IncomePieChart from "../components/statistics/IncomePieChart.vue";
 import StatisticsSummary from "../components/statistics/StatisticsSummary.vue";
 import LoadingSkeleton from "../components/shared/LoadingSkeleton.vue";
 import EmptyState from "../components/shared/EmptyState.vue";

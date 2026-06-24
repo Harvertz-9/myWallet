@@ -33,6 +33,8 @@
         :key="tx.id"
         :transaction="tx"
         @click="onCardClick(tx)"
+        @edit="$emit('edit', $event)"
+        @delete="$emit('delete', $event)"
       />
     </div>
   </div>
@@ -50,6 +52,8 @@ defineProps<{
 
 const emit = defineEmits<{
   (e: "select", transaction: Transaction): void;
+  (e: "edit", transaction: Transaction): void;
+  (e: "delete", id: string): void;
 }>();
 
 const onCardClick = (tx: Transaction) => {
