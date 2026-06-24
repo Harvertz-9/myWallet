@@ -13,7 +13,7 @@
           </button>
         </ion-buttons>
         <ion-title class="text-base font-bold text-gray-900 dark:text-white text-center">
-          Kustomisasi Profil
+          {{ t('edit_profile.title') }}
         </ion-title>
         <div slot="end" class="w-10"></div> <!-- Spacer for symmetry -->
       </ion-toolbar>
@@ -26,19 +26,49 @@
           <!-- Avatar Customization Card -->
           <BaseCard padding="md" class="bg-white dark:bg-card-dark flex flex-col items-center border border-gray-100 dark:border-gray-800/40">
             <span class="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-4 block w-full text-left">
-              Pilih Avatar Emoji
+              {{ t('edit_profile.avatar_label') }}
             </span>
 
             <!-- Large Selected Avatar Preview -->
-            <div class="relative mb-5">
+            <div class="relative mb-5 group">
               <div 
-                class="w-24 h-24 rounded-full bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary-tint flex items-center justify-center text-5xl font-extrabold shadow-md border border-primary/20"
+                class="w-24 h-24 rounded-full bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary-tint flex items-center justify-center text-5xl font-extrabold shadow-md border border-primary/20 overflow-hidden"
               >
-                <span>{{ selectedEmoji || '👤' }}</span>
+                <img v-if="selectedPhoto && selectedPhoto.startsWith('data:image')" :src="selectedPhoto" class="w-full h-full object-cover" />
+                <span v-else-if="selectedPhoto">{{ selectedPhoto }}</span>
+                <span v-else>👤</span>
               </div>
               <div class="absolute bottom-0 right-0 bg-primary text-white p-1.5 rounded-full border-2 border-white dark:border-card-dark">
-                <ion-icon :icon="sparkles" class="text-xs block" />
+                <ion-icon :icon="cameraOutline" class="text-xs block" />
               </div>
+            </div>
+
+            <!-- Upload Action Buttons -->
+            <div class="flex gap-3 mb-4 w-full">
+              <button 
+                type="button"
+                class="flex-1 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl py-2 px-3 text-sm font-semibold flex items-center justify-center gap-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+                @click="triggerCamera"
+              >
+                <ion-icon :icon="camera" class="text-lg text-primary" />
+                {{ t('edit_profile.camera') }}
+              </button>
+              <button 
+                type="button"
+                class="flex-1 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl py-2 px-3 text-sm font-semibold flex items-center justify-center gap-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+                @click="triggerGallery"
+              >
+                <ion-icon :icon="imageOutline" class="text-lg text-primary" />
+                {{ t('edit_profile.gallery') }}
+              </button>
+              
+              <!-- Hidden file inputs -->
+              <input type="file" ref="cameraInput" accept="image/*" capture="environment" class="hidden" @change="handleFileUpload" />
+              <input type="file" ref="galleryInput" accept="image/*" class="hidden" @change="handleFileUpload" />
+            </div>
+
+            <div class="w-full border-t border-gray-100 dark:border-gray-800/40 pt-4 mb-2">
+              <p class="text-xs text-center text-gray-500 mb-3">{{ t('edit_profile.emoji_label') }}</p>
             </div>
 
             <!-- Emojis Grid -->
@@ -48,10 +78,10 @@
                 :key="emoji"
                 type="button"
                 class="w-12 h-12 text-2xl flex items-center justify-center rounded-xl border transition-all duration-200 cursor-pointer"
-                :class="selectedEmoji === emoji 
+                :class="selectedPhoto === emoji 
                   ? 'bg-primary/20 border-primary scale-110 shadow-sm' 
                   : 'bg-gray-50 dark:bg-gray-800/50 border-gray-100 dark:border-gray-850 hover:bg-gray-100 dark:hover:bg-gray-800'"
-                @click="selectedEmoji = emoji"
+                @click="selectedPhoto = emoji"
               >
                 {{ emoji }}
               </button>
@@ -63,8 +93,8 @@
             <!-- Full Name -->
             <BaseInput
               v-model="fullName"
-              label="Nama Lengkap"
-              placeholder="Masukkan nama lengkap Anda"
+              :label="t('edit_profile.name_label')"
+              :placeholder="t('edit_profile.name_placeholder')"
               :error="errors.fullName"
               :maxlength="20"
             >
@@ -76,8 +106,8 @@
             <!-- Occupation -->
             <BaseInput
               v-model="occupation"
-              label="Pekerjaan / Status"
-              placeholder="e.g. Mahasiswa / Personal Finance"
+              :label="t('edit_profile.occupation_label')"
+              :placeholder="t('edit_profile.occupation_placeholder')"
               :error="errors.occupation"
               :maxlength="30"
             >
@@ -89,17 +119,17 @@
             <!-- Bio -->
             <div class="flex flex-col w-full gap-1.5">
               <label class="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-1">
-                Bio Singkat
+                {{ t('edit_profile.bio_label') }}
               </label>
               <textarea
                 v-model="bio"
-                placeholder="Tulis bio atau catatan finansial Anda..."
+                :placeholder="t('edit_profile.bio_placeholder')"
                 maxlength="100"
                 rows="3"
                 class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent rounded-2xl p-4 text-sm font-medium transition-all duration-200"
               ></textarea>
               <span class="text-[10px] text-right text-gray-400 dark:text-gray-500 font-semibold uppercase tracking-wider mt-0.5">
-                {{ bio.length }}/100 karakter
+                {{ bio.length }}/100 {{ t('edit_profile.bio_counter') }}
               </span>
             </div>
           </BaseCard>
@@ -112,8 +142,8 @@
               :full="true"
               :disabled="saving"
             >
-              <span v-if="saving">Menyimpan...</span>
-              <span v-else>Simpan Perubahan</span>
+              <span v-if="saving">{{ t('edit_profile.saving') }}</span>
+              <span v-else>{{ t('edit_profile.save') }}</span>
             </BaseButton>
           </div>
         </form>
@@ -133,13 +163,16 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
 import { IonPage, IonContent, IonHeader, IonToolbar, IonButtons, IonTitle, IonIcon } from "@ionic/vue";
-import { arrowBackOutline, personOutline, briefcaseOutline, sparkles } from "ionicons/icons";
+import { arrowBackOutline, personOutline, briefcaseOutline, sparkles, cameraOutline, imageOutline, camera } from "ionicons/icons";
 import { useRouter } from "vue-router";
 import BaseCard from "../components/base/BaseCard.vue";
 import BaseInput from "../components/base/BaseInput.vue";
 import BaseButton from "../components/base/BaseButton.vue";
 import ToastMessage from "../components/shared/ToastMessage.vue";
 import { useProfileStore } from "../stores/profileStore";
+import { useI18n } from "../utils/i18n";
+
+const { t } = useI18n();
 
 const router = useRouter();
 const profileStore = useProfileStore();
@@ -148,8 +181,11 @@ const profileStore = useProfileStore();
 const fullName = ref("");
 const occupation = ref("");
 const bio = ref("");
-const selectedEmoji = ref("");
+const selectedPhoto = ref("");
 const saving = ref(false);
+
+const cameraInput = ref<HTMLInputElement | null>(null);
+const galleryInput = ref<HTMLInputElement | null>(null);
 
 const errors = ref({
   fullName: "",
@@ -181,11 +217,64 @@ onMounted(() => {
   fullName.value = profileStore.name;
   occupation.value = profileStore.occupation;
   bio.value = profileStore.bio;
-  selectedEmoji.value = profileStore.photo || emojis[0];
+  selectedPhoto.value = profileStore.photo || emojis[0];
 });
 
 const goBack = () => {
   router.back();
+};
+
+const triggerCamera = () => {
+  if (cameraInput.value) cameraInput.value.click();
+};
+
+const triggerGallery = () => {
+  if (galleryInput.value) galleryInput.value.click();
+};
+
+const handleFileUpload = (event: Event) => {
+  const target = event.target as HTMLInputElement;
+  if (target.files && target.files.length > 0) {
+    const file = target.files[0];
+    const reader = new FileReader();
+    
+    reader.onload = (e) => {
+      if (e.target && typeof e.target.result === 'string') {
+        // Simple client side resize using canvas
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const MAX_WIDTH = 200;
+          const MAX_HEIGHT = 200;
+          let width = img.width;
+          let height = img.height;
+
+          if (width > height) {
+            if (width > MAX_WIDTH) {
+              height *= MAX_WIDTH / width;
+              width = MAX_WIDTH;
+            }
+          } else {
+            if (height > MAX_HEIGHT) {
+              width *= MAX_HEIGHT / height;
+              height = MAX_HEIGHT;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx?.drawImage(img, 0, 0, width, height);
+          
+          selectedPhoto.value = canvas.toDataURL('image/jpeg', 0.8);
+        };
+        img.src = e.target.result;
+      }
+    };
+    
+    reader.readAsDataURL(file);
+    target.value = ''; // Reset input
+  }
 };
 
 const validate = (): boolean => {
@@ -193,10 +282,10 @@ const validate = (): boolean => {
   errors.value = { fullName: "", occupation: "" };
 
   if (!fullName.value.trim()) {
-    errors.value.fullName = "Nama lengkap tidak boleh kosong";
+    errors.value.fullName = t('edit_profile.error_name_empty');
     valid = false;
   } else if (fullName.value.trim().length < 2) {
-    errors.value.fullName = "Nama lengkap minimal 2 karakter";
+    errors.value.fullName = t('edit_profile.error_name_min');
     valid = false;
   }
 
@@ -212,12 +301,12 @@ const saveProfile = async () => {
     
     profileStore.updateProfile({
       name: fullName.value,
-      photo: selectedEmoji.value,
+      photo: selectedPhoto.value,
       occupation: occupation.value,
       bio: bio.value,
     });
     
-    triggerToast("Profil berhasil diperbarui.");
+    triggerToast(t('edit_profile.toast_success'));
     
     setTimeout(() => {
       saving.value = false;
@@ -225,7 +314,7 @@ const saveProfile = async () => {
     }, 1200);
   } catch (error) {
     saving.value = false;
-    triggerToast("Gagal menyimpan profil.", "danger");
+    triggerToast(t('edit_profile.toast_fail'), "danger");
   }
 };
 </script>

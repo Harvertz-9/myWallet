@@ -2,23 +2,30 @@
   <ion-page>
     <ion-content :fullscreen="true" class="ion-padding">
       <div class="page-container space-y-6 pb-28">
-        <!-- Header Profile Greeting -->
-        <div class="flex items-center justify-between pt-5 pb-2 px-1">
+        <!-- Header Profile Greeting (Redesigned) -->
+        <div class="flex items-center justify-between pt-5 pb-2 px-1 animate-[fadeIn_0.5s_ease-out]">
           <div>
             <span class="text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider block mb-1">
               {{ todayString }}
             </span>
             <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-gray-950 dark:text-white">
-              {{ greeting }}, <span class="text-primary dark:text-primary-tint font-extrabold">{{ profileStore.name }}</span>!
+              {{ greeting }}, <span class="bg-linear-to-r from-primary to-emerald-400 bg-clip-text text-transparent font-extrabold">{{ profileStore.name }}</span>!
             </h1>
           </div>
           <!-- Avatar Clickable -> Navigates to Profile -->
           <router-link
             to="/tabs/profile"
-            class="w-11 h-11 rounded-full bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary-tint flex items-center justify-center text-xl shadow-sm hover:scale-105 transition-transform shrink-0 border border-primary/15"
+            class="relative w-12 h-12 rounded-full bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary-tint flex items-center justify-center text-xl shadow-sm hover:scale-105 transition-transform shrink-0 border border-primary/20 overflow-hidden group cursor-pointer"
           >
-            <span v-if="profileStore.photo">{{ profileStore.photo }}</span>
+            <!-- Hover effect overlay -->
+            <div class="absolute inset-0 bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            
+            <img v-if="profileStore.photo && profileStore.photo.startsWith('data:image')" :src="profileStore.photo" class="w-full h-full object-cover" />
+            <span v-else-if="profileStore.photo">{{ profileStore.photo }}</span>
             <span v-else class="font-extrabold">{{ profileStore.name ? profileStore.name.charAt(0).toUpperCase() : 'P' }}</span>
+            
+            <!-- Online status indicator -->
+            <div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white dark:border-gray-900 rounded-full"></div>
           </router-link>
         </div>
 
@@ -39,8 +46,8 @@
         <!-- Empty State -->
         <div v-else-if="transactionStore.transactions.length === 0" class="pt-2">
           <EmptyState
-            title="Belum Ada Transaksi"
-            description="Tap tombol + di bawah untuk menambahkan transaksi pertama Anda."
+            :title="t('dashboard.empty_title')"
+            :description="t('dashboard.empty_desc')"
           />
         </div>
 
@@ -108,9 +115,11 @@ import { useTransactionStore } from "../stores/transactionStore";
 import { useProfileStore } from "../stores/profileStore";
 import { Transaction } from "../types/transaction";
 import { formatDate } from "../utils/dateFormatter";
+import { useI18n } from "../utils/i18n";
 
 const transactionStore = useTransactionStore();
 const profileStore = useProfileStore();
+const { t } = useI18n();
 
 // Modal States
 const isAddModalOpen = ref(false);
@@ -166,17 +175,17 @@ const onPageChange = (page: number) => {
 // Dynamic Greeting based on current hour
 const greeting = computed(() => {
   const hr = new Date().getHours();
-  if (hr < 11) return "Selamat Pagi";
-  if (hr < 15) return "Selamat Siang";
-  if (hr < 19) return "Selamat Sore";
-  return "Selamat Malam";
+  if (hr < 11) return t('dashboard.greeting_morning');
+  if (hr < 15) return t('dashboard.greeting_afternoon');
+  if (hr < 19) return t('dashboard.greeting_evening');
+  return t('dashboard.greeting_night');
 });
 
 // Format Date e.g. Minggu, 14 Juni 2026
 const todayString = computed(() => {
-  const days = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
-  const dayName = days[new Date().getDay()];
   const dateFormatted = formatDate(new Date().toLocaleDateString("en-CA"));
+  const dayIndex = new Date().getDay();
+  const dayName = t(`day.${dayIndex}`);
   return `${dayName}, ${dateFormatted}`;
 });
 
@@ -186,9 +195,9 @@ const handleAddTransaction = (newTx: Transaction) => {
     transactionStore.addTransaction(newTx);
     isAddModalOpen.value = false;
     currentPage.value = 1;
-    triggerToast("Transaksi berhasil ditambahkan.");
+    triggerToast(t('dashboard.toast_add_success'));
   } catch (error) {
-    triggerToast("Gagal menyimpan transaksi", "danger");
+    triggerToast(t('dashboard.toast_add_fail'), "danger");
   }
 };
 
@@ -206,9 +215,9 @@ const handleUpdateTransaction = (updatedTx: Transaction) => {
   try {
     transactionStore.updateTransaction(updatedTx);
     closeEditModal();
-    triggerToast("Transaksi berhasil diperbarui.");
+    triggerToast(t('dashboard.toast_update_success'));
   } catch (error) {
-    triggerToast("Gagal memperbarui transaksi", "danger");
+    triggerToast(t('dashboard.toast_update_fail'), "danger");
   }
 };
 </script>

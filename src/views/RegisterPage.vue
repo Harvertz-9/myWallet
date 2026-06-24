@@ -12,15 +12,15 @@
             <div class="auth-logo">
               <ion-icon :icon="walletOutline" class="text-3xl text-white block" />
             </div>
-            <h1 class="auth-title">Buat Akun</h1>
-            <p class="auth-subtitle">Daftar dan mulai catat keuangan Anda</p>
+            <h1 class="auth-title">{{ t('auth.register_title') }}</h1>
+            <p class="auth-subtitle">{{ t('auth.register_subtitle') }}</p>
           </div>
 
           <!-- Form -->
           <form class="auth-form" @submit.prevent="handleRegister">
             <!-- Name -->
             <div class="auth-field">
-              <label class="auth-label">Nama Lengkap</label>
+              <label class="auth-label">{{ t('auth.name') }}</label>
               <div class="auth-input-wrap" :class="{ 'error': errors.name }">
                 <ion-icon :icon="personOutline" class="auth-input-icon" />
                 <input
@@ -37,7 +37,7 @@
 
             <!-- Email -->
             <div class="auth-field">
-              <label class="auth-label">Email</label>
+              <label class="auth-label">{{ t('auth.email') }}</label>
               <div class="auth-input-wrap" :class="{ 'error': errors.email }">
                 <ion-icon :icon="mailOutline" class="auth-input-icon" />
                 <input
@@ -54,7 +54,7 @@
 
             <!-- Password -->
             <div class="auth-field">
-              <label class="auth-label">Kata Sandi</label>
+              <label class="auth-label">{{ t('auth.password') }}</label>
               <div class="auth-input-wrap" :class="{ 'error': errors.password }">
                 <ion-icon :icon="lockClosedOutline" class="auth-input-icon" />
                 <input
@@ -78,7 +78,7 @@
 
             <!-- Confirm Password -->
             <div class="auth-field">
-              <label class="auth-label">Konfirmasi Kata Sandi</label>
+              <label class="auth-label">{{ t('password.confirm') }}</label>
               <div class="auth-input-wrap" :class="{ 'error': errors.confirmPassword }">
                 <ion-icon :icon="lockClosedOutline" class="auth-input-icon" />
                 <input
@@ -119,18 +119,18 @@
               :disabled="loading"
             >
               <span v-if="loading" class="auth-spinner"></span>
-              <span v-else>Daftar Sekarang</span>
+              <span v-else>{{ t('auth.register_btn') }}</span>
             </button>
           </form>
 
           <!-- Divider -->
           <div class="auth-divider">
-            <span>Sudah punya akun?</span>
+            <span>{{ t('auth.has_account') }}</span>
           </div>
 
           <!-- Login Link -->
           <router-link to="/login" class="auth-btn-secondary">
-            Masuk
+            {{ t('auth.login_link') }}
           </router-link>
         </div>
       </div>
@@ -153,9 +153,11 @@ import {
 } from "ionicons/icons";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "../stores/authStore";
+import { useI18n } from "../utils/i18n";
 
 const router = useRouter();
 const authStore = useAuthStore();
+const { t } = useI18n();
 
 const name = ref("");
 const email = ref("");

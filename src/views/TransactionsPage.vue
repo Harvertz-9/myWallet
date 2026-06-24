@@ -3,20 +3,25 @@
     <ion-content :fullscreen="true" class="ion-padding">
       <div class="page-container space-y-4 pb-20">
         <!-- Page Header -->
-        <div class="pt-4 px-1">
-          <span class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider block">
-            Kelola Keuangan
-          </span>
-          <h1 class="text-2xl font-black text-gray-900 dark:text-white">
-            Riwayat Transaksi
-          </h1>
+        <div class="pt-4 px-1 flex items-center justify-between animate-[fadeIn_0.5s_ease-out]">
+          <div>
+            <span class="text-xs font-semibold text-primary dark:text-primary-tint uppercase tracking-wider block mb-1">
+              {{ t('transactions.header_subtitle') }}
+            </span>
+            <h1 class="text-2xl font-black text-gray-900 dark:text-white">
+              {{ t('transactions.header_title') }}
+            </h1>
+          </div>
+          <div class="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center text-xl shrink-0 shadow-sm border border-blue-200 dark:border-blue-800/50">
+            <ion-icon :icon="receiptOutline" />
+          </div>
         </div>
 
         <!-- Search Bar -->
         <SearchBar v-model="searchQuery" @update:modelValue="resetPage" />
 
         <!-- Time Filter Dropdown -->
-        <TimeFilterDropdown v-model="timeFilter" label="Filter Periode" @update:modelValue="resetPage" />
+        <TimeFilterDropdown v-model="timeFilter" :label="t('transactions.filter_period')" @update:modelValue="resetPage" />
 
         <!-- Filter Chips -->
         <FilterChip v-model="activeFilter" @update:modelValue="resetPage" />
@@ -28,8 +33,8 @@
 
         <div v-else-if="filteredTransactions.length === 0" class="pt-6">
           <EmptyState
-            title="Tidak ada transaksi"
-            description="Tidak ada transaksi yang cocok dengan pencarian atau filter Anda."
+            :title="t('transactions.empty_title')"
+            :description="t('transactions.empty_desc')"
           />
         </div>
 
@@ -62,8 +67,8 @@
       <!-- Delete Confirmation Modal -->
       <ConfirmationModal
         :is-open="isDeleteConfirmOpen"
-        title="Hapus Transaksi?"
-        message="Catatan transaksi ini akan dihapus secara permanen dari penyimpanan lokal Anda."
+        :title="t('transactions.delete_title')"
+        :message="t('transactions.delete_msg')"
         @confirm="confirmDelete"
         @cancel="cancelDelete"
       />
@@ -81,7 +86,8 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from "vue";
-import { IonPage, IonContent } from "@ionic/vue";
+import { IonPage, IonContent, IonIcon } from "@ionic/vue";
+import { receiptOutline } from "ionicons/icons";
 import SearchBar from "../components/transaction/SearchBar.vue";
 import FilterChip from "../components/transaction/FilterChip.vue";
 import TransactionList from "../components/transaction/TransactionList.vue";
@@ -94,8 +100,10 @@ import Pagination from "../components/shared/Pagination.vue";
 import TimeFilterDropdown, { TimeFilterValue } from "../components/shared/TimeFilterDropdown.vue";
 import { useTransactionStore } from "../stores/transactionStore";
 import { Transaction } from "../types/transaction";
+import { useI18n } from "../utils/i18n";
 
 const transactionStore = useTransactionStore();
+const { t } = useI18n();
 
 // Filter States
 const searchQuery = ref("");
@@ -254,9 +262,9 @@ const handleUpdate = (updatedTx: Transaction) => {
   try {
     transactionStore.updateTransaction(updatedTx);
     closeEditModal();
-    triggerToast("Transaksi berhasil diperbarui.");
+    triggerToast(t('transactions.toast_update_success'));
   } catch (error) {
-    triggerToast("Gagal memperbarui transaksi", "danger");
+    triggerToast(t('transactions.toast_update_fail'), "danger");
   }
 };
 
@@ -270,13 +278,13 @@ const confirmDelete = () => {
   if (transactionIdToDelete.value) {
     try {
       transactionStore.deleteTransaction(transactionIdToDelete.value);
-      triggerToast("Transaksi berhasil dihapus.");
+      triggerToast(t('transactions.toast_delete_success'));
       // Reset to page 1 if current page is now empty
       if (paginatedTransactions.value.length === 0 && currentPage.value > 1) {
         currentPage.value = currentPage.value - 1;
       }
     } catch (error) {
-      triggerToast("Gagal menghapus transaksi", "danger");
+      triggerToast(t('transactions.toast_delete_fail'), "danger");
     } finally {
       transactionIdToDelete.value = null;
       isDeleteConfirmOpen.value = false;

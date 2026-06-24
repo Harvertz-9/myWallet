@@ -6,25 +6,25 @@
         <!-- Dashboard Tab -->
         <ion-tab-button tab="dashboard" href="/tabs/dashboard">
           <ion-icon aria-hidden="true" :icon="wallet" />
-          <ion-label>Dashboard</ion-label>
+          <ion-label>{{ t('tab.dashboard') }}</ion-label>
         </ion-tab-button>
 
         <!-- Transactions Tab -->
         <ion-tab-button tab="transactions" href="/tabs/transactions">
           <ion-icon aria-hidden="true" :icon="receipt" />
-          <ion-label>Transaksi</ion-label>
+          <ion-label>{{ t('tab.transactions') }}</ion-label>
         </ion-tab-button>
 
         <!-- Statistics Tab -->
         <ion-tab-button tab="statistics" href="/tabs/statistics">
           <ion-icon aria-hidden="true" :icon="pieChart" />
-          <ion-label>Statistik</ion-label>
+          <ion-label>{{ t('tab.statistics') }}</ion-label>
         </ion-tab-button>
 
         <!-- Profile Tab -->
         <ion-tab-button tab="profile" href="/tabs/profile">
           <ion-icon aria-hidden="true" :icon="personCircle" />
-          <ion-label>Profil</ion-label>
+          <ion-label>{{ t('tab.profile') }}</ion-label>
         </ion-tab-button>
       </ion-tab-bar>
     </ion-tabs>
@@ -42,6 +42,9 @@ import {
   IonRouterOutlet,
 } from "@ionic/vue";
 import { wallet, receipt, pieChart, personCircle } from "ionicons/icons";
+import { useI18n } from "../utils/i18n";
+
+const { t } = useI18n();
 </script>
 
 <style scoped>

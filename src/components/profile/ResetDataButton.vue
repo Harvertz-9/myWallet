@@ -13,10 +13,10 @@
         </div>
         <div class="min-w-0">
           <p class="text-sm font-bold text-gray-950 dark:text-white">
-            Reset Seluruh Data
+            {{ t('profile.reset_title') }}
           </p>
           <p class="text-[11px] text-gray-500 dark:text-gray-400 font-semibold uppercase tracking-wider truncate">
-            Hapus riwayat transaksi &amp; profil
+            {{ t('profile.reset_desc') }}
           </p>
         </div>
       </div>
@@ -26,7 +26,7 @@
         class="shrink-0"
         @click="$emit('reset')"
       >
-        Hapus
+        {{ t('profile.reset_btn') }}
       </BaseButton>
     </div>
   </BaseCard>
@@ -37,6 +37,9 @@ import { IonIcon } from "@ionic/vue";
 import { trashOutline } from "ionicons/icons";
 import BaseCard from "../base/BaseCard.vue";
 import BaseButton from "../base/BaseButton.vue";
+import { useI18n } from "../../utils/i18n";
+
+const { t } = useI18n();
 
 defineEmits<{
   (e: "reset"): void;

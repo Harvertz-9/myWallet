@@ -12,15 +12,15 @@
             <div class="auth-logo">
               <ion-icon :icon="walletOutline" class="text-3xl text-white block" />
             </div>
-            <h1 class="auth-title">MyWallet</h1>
-            <p class="auth-subtitle">Masuk untuk kelola keuangan Anda</p>
+            <h1 class="auth-title">{{ t('auth.login_title') }}</h1>
+            <p class="auth-subtitle">{{ t('auth.login_subtitle') }}</p>
           </div>
 
           <!-- Form -->
           <form class="auth-form" @submit.prevent="handleLogin">
             <!-- Email -->
             <div class="auth-field">
-              <label class="auth-label">Email</label>
+              <label class="auth-label">{{ t('auth.email') }}</label>
               <div class="auth-input-wrap" :class="{ 'error': errors.email }">
                 <ion-icon :icon="mailOutline" class="auth-input-icon" />
                 <input
@@ -37,7 +37,7 @@
 
             <!-- Password -->
             <div class="auth-field">
-              <label class="auth-label">Kata Sandi</label>
+              <label class="auth-label">{{ t('auth.password') }}</label>
               <div class="auth-input-wrap" :class="{ 'error': errors.password }">
                 <ion-icon :icon="lockClosedOutline" class="auth-input-icon" />
                 <input
@@ -72,18 +72,18 @@
               :disabled="loading"
             >
               <span v-if="loading" class="auth-spinner"></span>
-              <span v-else>Masuk</span>
+              <span v-else>{{ t('auth.login_btn') }}</span>
             </button>
           </form>
 
           <!-- Divider -->
           <div class="auth-divider">
-            <span>Belum punya akun?</span>
+            <span>{{ t('auth.no_account') }}</span>
           </div>
 
           <!-- Register Link -->
           <router-link to="/register" class="auth-btn-secondary">
-            Daftar Sekarang
+            {{ t('auth.register_link') }}
           </router-link>
         </div>
       </div>
@@ -104,9 +104,11 @@ import {
 } from "ionicons/icons";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "../stores/authStore";
+import { useI18n } from "../utils/i18n";
 
 const router = useRouter();
 const authStore = useAuthStore();
+const { t } = useI18n();
 
 const email = ref("");
 const password = ref("");

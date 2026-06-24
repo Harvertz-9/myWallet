@@ -6,7 +6,7 @@ import { authService } from "../services/authService";
 const routes: Array<RouteRecordRaw> = [
   {
     path: "/",
-    redirect: "/login",
+    component: () => import("@/views/SplashPage.vue"),
   },
   {
     path: "/login",

@@ -59,8 +59,8 @@
 import { ref, computed } from "vue";
 import { formatRupiah } from "../../utils/currencyFormatter";
 
-// Maximum allowed transaction amount: 999 billion
-const MAX_AMOUNT = 999_999_999_999;
+// Maximum allowed transaction amount: 99 billion
+const MAX_AMOUNT = 99_999_999_999;
 
 const props = withDefaults(
   defineProps<{

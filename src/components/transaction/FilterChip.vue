@@ -4,7 +4,7 @@
       v-for="filter in filters"
       :key="filter.value"
       type="button"
-      class="px-6 py-3 text-sm font-bold rounded-full transition-all duration-200 cursor-pointer whitespace-nowrap btn-press border min-h-11"
+      class="px-4 py-2 text-sm font-bold rounded-full transition-all duration-200 cursor-pointer whitespace-nowrap btn-press border min-h-[36px]"
       :class="[
         modelValue === filter.value
           ? 'bg-primary text-white border-primary shadow-md shadow-primary/25'
