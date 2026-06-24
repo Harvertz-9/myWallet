@@ -3,10 +3,11 @@
     ref="slidingRef"
     class="custom-sliding-item mb-3 rounded-2xl overflow-hidden"
   >
-    <!-- Left options (Swipe to right) -> Edit -->
-    <ion-item-options side="start">
+    <!-- Left options (Swipe to right) → Edit -->
+    <ion-item-options side="start" @ionSwipe="handleEdit">
       <ion-item-option
         color="warning"
+        expandable
         class="font-bold flex items-center justify-center gap-1 cursor-pointer"
         @click="handleEdit"
       >
@@ -64,10 +65,11 @@
       </div>
     </ion-item>
 
-    <!-- Right options (Swipe to left) -> Delete -->
-    <ion-item-options side="end">
+    <!-- Right options (Swipe to left) → Delete -->
+    <ion-item-options side="end" @ionSwipe="handleDelete">
       <ion-item-option
         color="danger"
+        expandable
         class="font-bold flex items-center justify-center gap-1 cursor-pointer"
         @click="handleDelete"
       >
@@ -154,17 +156,21 @@ const getCategoryLabel = (category: string) => {
   return categoryLabelMap[category] || category;
 };
 
-const handleEdit = () => {
-  if (slidingRef.value) {
-    slidingRef.value.close();
+/** Closes the sliding item safely, handling Vue proxy wrapping */
+const closeSlidingItem = () => {
+  const el = slidingRef.value?.$el ?? slidingRef.value;
+  if (el && typeof el.close === "function") {
+    el.close();
   }
+};
+
+const handleEdit = () => {
+  closeSlidingItem();
   emit("edit", props.transaction);
 };
 
 const handleDelete = () => {
-  if (slidingRef.value) {
-    slidingRef.value.close();
-  }
+  closeSlidingItem();
   emit("delete", props.transaction.id);
 };
 </script>
@@ -175,5 +181,11 @@ ion-item {
   --inner-padding-end: 0;
   --padding-start: 12px;
   --padding-end: 12px;
+}
+
+/* Ensure sliding item fills width and gestures are captured correctly */
+.custom-sliding-item {
+  display: block;
+  width: 100%;
 }
 </style>

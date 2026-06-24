@@ -2,16 +2,10 @@
   <ion-page>
     <ion-content :fullscreen="true" class="splash-content">
       <div class="splash-container">
-        <!-- Background decorative elements -->
-        <div class="splash-bg-ring ring-1"></div>
-        <div class="splash-bg-ring ring-2"></div>
-        <div class="splash-bg-ring ring-3"></div>
-
         <!-- Main Content -->
         <div class="splash-main">
           <!-- Logo -->
           <div class="splash-logo-wrapper" :class="{ 'animate-in': showContent }">
-            <div class="splash-logo-glow"></div>
             <img
               src="/image/logo.jpg"
               alt="myWallet Logo"
@@ -105,48 +99,11 @@ onUnmounted(() => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 100vh;
+  width: 100%;
+  height: 100%;
+  min-height: 100dvh;
+  background: #0a0f1a;
   overflow: hidden;
-  background: radial-gradient(ellipse at 50% 30%, #0d2818 0%, #0a0f1a 55%, #060a12 100%);
-}
-
-/* Decorative background rings */
-.splash-bg-ring {
-  position: absolute;
-  border-radius: 50%;
-  border: 1px solid rgba(16, 185, 129, 0.06);
-}
-
-.ring-1 {
-  width: 300px;
-  height: 300px;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  animation: pulseRing 3s ease-in-out infinite;
-}
-
-.ring-2 {
-  width: 500px;
-  height: 500px;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  animation: pulseRing 3s ease-in-out infinite 0.5s;
-}
-
-.ring-3 {
-  width: 700px;
-  height: 700px;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  animation: pulseRing 3s ease-in-out infinite 1s;
-}
-
-@keyframes pulseRing {
-  0%, 100% { opacity: 0.3; transform: translate(-50%, -50%) scale(1); }
-  50% { opacity: 0.6; transform: translate(-50%, -50%) scale(1.05); }
 }
 
 /* Main content area */
@@ -154,11 +111,11 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2rem;
+  gap: clamp(1.25rem, 4vw, 2rem);
   z-index: 10;
 }
 
-/* Logo wrapper with glow effect */
+/* Logo wrapper */
 .splash-logo-wrapper {
   position: relative;
   opacity: 0;
@@ -171,28 +128,13 @@ onUnmounted(() => {
   transform: scale(1) translateY(0);
 }
 
-.splash-logo-glow {
-  position: absolute;
-  inset: -20px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(16, 185, 129, 0.25) 0%, transparent 70%);
-  filter: blur(20px);
-  animation: glowPulse 2.5s ease-in-out infinite;
-}
-
-@keyframes glowPulse {
-  0%, 100% { opacity: 0.6; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.1); }
-}
-
 .splash-logo-img {
   position: relative;
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
+  width: 130px;
+  height: 140px;
   object-fit: cover;
-  border: 3px solid rgba(16, 185, 129, 0.4);
-  box-shadow: 0 0 40px rgba(16, 185, 129, 0.15), 0 8px 32px rgba(0, 0, 0, 0.4);
+  /* Make logo white */
+  filter: brightness(0) invert(1);
   z-index: 1;
 }
 
@@ -210,20 +152,17 @@ onUnmounted(() => {
 }
 
 .splash-title {
-  font-size: 2.5rem;
+  font-size: clamp(1.8rem, 7vw, 2.8rem);
   font-weight: 900;
   letter-spacing: -0.02em;
-  background: linear-gradient(135deg, #34d399 0%, #10B981 40%, #059669 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  margin: 0 0 0.5rem 0;
+  color: #ffffff;
+  margin: 0 0 0.4rem 0;
   line-height: 1.1;
 }
 
 .splash-subtitle {
-  font-size: 1rem;
-  color: rgba(255, 255, 255, 0.6);
+  font-size: clamp(0.85rem, 3vw, 1rem);
+  color: rgba(255, 255, 255, 0.5);
   font-weight: 500;
   margin: 0;
   letter-spacing: 0.01em;
@@ -232,14 +171,14 @@ onUnmounted(() => {
 /* Bottom progress area */
 .splash-bottom {
   position: absolute;
-  bottom: 60px;
+  bottom: clamp(40px, 8vh, 72px);
   left: 50%;
   transform: translateX(-50%);
-  width: 200px;
+  width: clamp(160px, 50vw, 240px);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   opacity: 0;
   transition: opacity 0.8s ease 0.6s;
   z-index: 10;
@@ -251,25 +190,26 @@ onUnmounted(() => {
 
 .splash-progress-track {
   width: 100%;
-  height: 3px;
-  background: rgba(255, 255, 255, 0.08);
+  height: 2px;
+  background: rgba(255, 255, 255, 0.1);
   border-radius: 99px;
   overflow: hidden;
 }
 
 .splash-progress-bar {
   height: 100%;
-  background: linear-gradient(90deg, #10B981, #34d399);
+  background: linear-gradient(90deg, rgba(255,255,255,0.5), rgba(255,255,255,0.9));
   border-radius: 99px;
   transition: width 0.05s linear;
-  box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
 }
 
 .splash-loading-text {
-  font-size: 0.7rem;
-  color: rgba(255, 255, 255, 0.35);
+  font-size: clamp(0.6rem, 2vw, 0.7rem);
+  color: rgba(255, 255, 255, 0.3);
   font-weight: 500;
   letter-spacing: 0.05em;
   margin: 0;
+  white-space: nowrap;
 }
 </style>
