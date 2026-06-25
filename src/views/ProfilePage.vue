@@ -1,7 +1,7 @@
 <template>
   <ion-page>
     <ion-content :fullscreen="true" class="ion-padding">
-      <div class="page-container space-y-5 pb-20">
+      <div class="page-container space-y-5 pb-32">
         <!-- Page Header -->
         <div class="pt-4 px-1 flex items-center justify-between animate-[fadeIn_0.5s_ease-out]">
           <div>

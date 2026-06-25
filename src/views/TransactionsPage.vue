@@ -1,7 +1,7 @@
 <template>
   <ion-page>
     <ion-content :fullscreen="true" class="ion-padding">
-      <div class="page-container space-y-4 pb-20">
+      <div class="page-container space-y-4 pb-32">
         <!-- Page Header -->
         <div class="pt-4 px-1 flex items-center justify-between animate-[fadeIn_0.5s_ease-out]">
           <div>
@@ -148,6 +148,15 @@ const filterByTimePeriod = (transactions: Transaction[], period: TimeFilterValue
 
   let fromDate: Date;
   switch (period) {
+    case "today":
+      fromDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      break;
+    case "this_week": {
+      const day = now.getDay();
+      const diff = now.getDate() - day + (day === 0 ? -6 : 1);
+      fromDate = new Date(now.getFullYear(), now.getMonth(), diff);
+      break;
+    }
     case "this_month":
       fromDate = new Date(now.getFullYear(), now.getMonth(), 1);
       break;

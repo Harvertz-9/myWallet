@@ -33,6 +33,8 @@ import { calendarOutline, chevronDownOutline } from "ionicons/icons";
 
 export type TimeFilterValue =
   | "all"
+  | "today"
+  | "this_week"
   | "this_month"
   | "last_3_months"
   | "last_6_months"
@@ -55,6 +57,8 @@ const emit = defineEmits<{
 
 const options: { label: string; value: TimeFilterValue }[] = [
   { label: "Semua Waktu", value: "all" },
+  { label: "Hari Ini", value: "today" },
+  { label: "Minggu Ini", value: "this_week" },
   { label: "Bulan Ini", value: "this_month" },
   { label: "3 Bulan Terakhir", value: "last_3_months" },
   { label: "6 Bulan Terakhir", value: "last_6_months" },

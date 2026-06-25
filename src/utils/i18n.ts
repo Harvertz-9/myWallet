@@ -119,6 +119,8 @@ const translations: Record<string, string> = {
 
   // ===== Time Filter =====
   "time.all": "Semua Waktu",
+  "time.today": "Hari Ini",
+  "time.this_week": "Minggu Ini",
   "time.this_month": "Bulan Ini",
   "time.last_3_months": "3 Bulan Terakhir",
   "time.last_6_months": "6 Bulan Terakhir",

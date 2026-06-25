@@ -3,7 +3,7 @@
     slot="fixed"
     vertical="bottom"
     horizontal="end"
-    class="mb-6 mr-4 pointer-events-auto"
+    class="mb-20 mr-4 pointer-events-auto"
   >
     <ion-fab-button
       color="primary"

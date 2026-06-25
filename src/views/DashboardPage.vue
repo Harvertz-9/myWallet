@@ -1,7 +1,7 @@
 <template>
   <ion-page>
     <ion-content :fullscreen="true" class="ion-padding">
-      <div class="page-container space-y-6 pb-28">
+      <div class="page-container space-y-6 pb-36">
         <!-- Header Profile Greeting (Redesigned) -->
         <div class="flex items-center justify-between pt-5 pb-2 px-1 animate-[fadeIn_0.5s_ease-out]">
           <div>
@@ -66,6 +66,8 @@
           />
         </div>
       </div>
+
+
 
       <!-- Add FAB -->
       <FloatingActionButton @click="isAddModalOpen = true" />

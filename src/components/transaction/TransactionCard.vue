@@ -1,7 +1,7 @@
 <template>
   <ion-item-sliding
     ref="slidingRef"
-    class="custom-sliding-item mb-3 rounded-2xl overflow-hidden"
+    class="custom-sliding-item mb-3 overflow-hidden"
   >
 
     <!-- Transaction Main Item -->
@@ -52,27 +52,20 @@
     </ion-item>
 
     <!-- Right options (Swipe to left) → Edit + Delete -->
-    <ion-item-options side="end" @ionSwipe="handleDelete">
+    <ion-item-options side="end">
       <ion-item-option
         color="warning"
-        class="font-bold flex items-center justify-center gap-1 cursor-pointer"
+        class="swipe-option"
         @click="handleEdit"
       >
-        <ion-icon
-          :icon="createOutline"
-          slot="icon-only"
-        />
+        <ion-icon :icon="createOutline" slot="icon-only" />
       </ion-item-option>
       <ion-item-option
         color="danger"
-        expandable
-        class="font-bold flex items-center justify-center gap-1 cursor-pointer"
+        class="swipe-option"
         @click="handleDelete"
       >
-        <ion-icon
-          :icon="trashOutline"
-          slot="icon-only"
-        />
+        <ion-icon :icon="trashOutline" slot="icon-only" />
       </ion-item-option>
     </ion-item-options>
   </ion-item-sliding>
@@ -183,5 +176,20 @@ ion-item {
 .custom-sliding-item {
   display: block;
   width: 100%;
+}
+
+/* Remove rounded corners from the transaction item so swipe options blend seamlessly */
+.transaction-item {
+  --border-radius: 0 !important;
+  border-radius: 0 !important;
+}
+
+/* Unified swipe option styling - no gaps, no rounding */
+.swipe-option {
+  --border-radius: 0;
+  border-radius: 0;
+  font-weight: 700;
+  font-size: 1.25rem;
+  min-width: 56px;
 }
 </style>

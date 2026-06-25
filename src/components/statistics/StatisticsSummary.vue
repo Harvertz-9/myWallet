@@ -8,7 +8,7 @@
       <!-- Total Transaksi -->
       <BaseCard
         padding="sm"
-        class="bg-white dark:bg-card-dark flex flex-col justify-between min-h-[90px]"
+        class="bg-white dark:bg-card-dark flex flex-col justify-between min-h-[90px] col-span-2"
       >
         <div class="flex items-center justify-between text-gray-400 dark:text-gray-500 mb-1">
           <span class="text-[10px] font-bold uppercase tracking-wider">Total Transaksi</span>
