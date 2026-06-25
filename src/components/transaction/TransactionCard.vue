@@ -1,74 +1,75 @@
 <template>
-  <ion-item-sliding
-    ref="slidingRef"
-    class="custom-sliding-item mb-3 overflow-hidden"
-  >
-
-    <!-- Transaction Main Item -->
-    <ion-item
-      button
-      :detail="false"
-      lines="none"
-      class="transaction-item bg-white dark:bg-card-dark border border-gray-100 dark:border-gray-800/40 rounded-2xl"
-      @click="$emit('click', transaction)"
+  <div class="card-wrapper rounded-2xl overflow-hidden mb-3">
+    <ion-item-sliding
+      ref="slidingRef"
+      class="custom-sliding-item"
     >
-      <div class="flex items-center justify-between w-full py-2.5">
-        <!-- Category Icon & Title & Date -->
-        <div class="flex items-center gap-3.5 min-w-0">
-          <div class="w-12 h-12 rounded-2xl bg-gray-50 dark:bg-gray-800 flex items-center justify-center text-2xl shadow-sm border border-gray-100/50 dark:border-gray-800/30">
-            {{ getEmoji(transaction.category) }}
-          </div>
-          <div class="min-w-0">
-            <h4 class="text-sm font-bold text-gray-900 dark:text-gray-100 truncate mb-0.5">
-              {{ transaction.title }}
-            </h4>
-            <div class="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400 font-medium">
-              <span>{{ getCategoryLabel(transaction.category) }}</span>
-              <span class="w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-700"></span>
-              <span>{{ formattedDate }}</span>
+
+      <!-- Transaction Main Item -->
+      <ion-item
+        button
+        :detail="false"
+        lines="none"
+        class="transaction-item bg-white dark:bg-card-dark border border-gray-100 dark:border-gray-800/40"
+        @click="$emit('click', transaction)"
+      >
+        <div class="flex items-center justify-between w-full py-2.5">
+          <!-- Category Icon & Title & Date -->
+          <div class="flex items-center gap-3.5 min-w-0">
+            <div class="w-12 h-12 rounded-2xl bg-gray-50 dark:bg-gray-800 flex items-center justify-center text-2xl shadow-sm border border-gray-100/50 dark:border-gray-800/30">
+              {{ getEmoji(transaction.category) }}
             </div>
+            <div class="min-w-0">
+              <h4 class="text-sm font-bold text-gray-900 dark:text-gray-100 truncate mb-0.5">
+                {{ transaction.title }}
+              </h4>
+              <div class="flex flex-col text-xs text-gray-500 dark:text-gray-400 font-medium leading-tight">
+                <span class="truncate">{{ getCategoryLabel(transaction.category) }}</span>
+                <span class="text-gray-400 dark:text-gray-500 font-normal mt-0.5">{{ formattedDate }}</span>
+              </div>
+              <p
+                v-if="transaction.note"
+                class="text-xs text-gray-400 dark:text-gray-500 italic mt-1 truncate max-w-45"
+              >
+                "{{ transaction.note }}"
+              </p>
+            </div>
+          </div>
+
+          <!-- Price/Amount -->
+          <div class="text-right pl-3 flex-shrink-0">
             <p
-              v-if="transaction.note"
-              class="text-xs text-gray-400 dark:text-gray-500 italic mt-0.5 truncate max-w-45"
+              class="text-sm font-extrabold whitespace-nowrap"
+              :class="transaction.type === 'income' ? 'text-green-600 dark:text-green-400' : 'text-red-500 dark:text-red-400'"
             >
-              "{{ transaction.note }}"
+              {{ transaction.type === 'income' ? '+' : '-' }} {{ formattedAmount }}
             </p>
+            <span class="text-[10px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
+              {{ transaction.type === 'income' ? 'Masuk' : 'Keluar' }}
+            </span>
           </div>
         </div>
+      </ion-item>
 
-        <!-- Price/Amount -->
-        <div class="text-right pl-3">
-          <p
-            class="text-sm font-extrabold"
-            :class="transaction.type === 'income' ? 'text-green-600 dark:text-green-400' : 'text-red-500 dark:text-red-400'"
-          >
-            {{ transaction.type === 'income' ? '+' : '-' }} {{ formattedAmount }}
-          </p>
-          <span class="text-[10px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
-            {{ transaction.type === 'income' ? 'Masuk' : 'Keluar' }}
-          </span>
-        </div>
-      </div>
-    </ion-item>
-
-    <!-- Right options (Swipe to left) → Edit + Delete -->
-    <ion-item-options side="end">
-      <ion-item-option
-        color="warning"
-        class="swipe-option"
-        @click="handleEdit"
-      >
-        <ion-icon :icon="createOutline" slot="icon-only" />
-      </ion-item-option>
-      <ion-item-option
-        color="danger"
-        class="swipe-option"
-        @click="handleDelete"
-      >
-        <ion-icon :icon="trashOutline" slot="icon-only" />
-      </ion-item-option>
-    </ion-item-options>
-  </ion-item-sliding>
+      <!-- Right options (Swipe to left) → Edit + Delete -->
+      <ion-item-options side="end">
+        <ion-item-option
+          color="warning"
+          class="swipe-option"
+          @click="handleEdit"
+        >
+          <ion-icon :icon="createOutline" slot="icon-only" />
+        </ion-item-option>
+        <ion-item-option
+          color="danger"
+          class="swipe-option"
+          @click="handleDelete"
+        >
+          <ion-icon :icon="trashOutline" slot="icon-only" />
+        </ion-item-option>
+      </ion-item-options>
+    </ion-item-sliding>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -165,7 +166,12 @@ const handleDelete = () => {
 </script>
 
 <style scoped>
-/* Remove standard padding or lines of ion-item if necessary */
+/* Isolate each card so swipe doesn't trigger layout on siblings */
+.card-wrapper {
+  contain: layout style;
+}
+
+/* Remove standard padding or lines of ion-item */
 ion-item {
   --inner-padding-end: 0;
   --padding-start: 12px;
@@ -176,12 +182,6 @@ ion-item {
 .custom-sliding-item {
   display: block;
   width: 100%;
-}
-
-/* Remove rounded corners from the transaction item so swipe options blend seamlessly */
-.transaction-item {
-  --border-radius: 0 !important;
-  border-radius: 0 !important;
 }
 
 /* Unified swipe option styling - no gaps, no rounding */

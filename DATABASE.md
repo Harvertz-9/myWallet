@@ -341,7 +341,7 @@ Profile
 
 
 Transactions
-(independent entity)
+(independent entity)    
 ```
 
 ---

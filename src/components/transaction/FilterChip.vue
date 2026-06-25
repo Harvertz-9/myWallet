@@ -1,10 +1,10 @@
 <template>
-  <div class="flex gap-2.5 overflow-x-auto no-scrollbar py-1">
+  <div class="flex gap-3 overflow-x-auto no-scrollbar py-1.5">
     <button
       v-for="filter in filters"
       :key="filter.value"
       type="button"
-      class="px-4 py-2 text-sm font-bold rounded-full transition-all duration-200 cursor-pointer whitespace-nowrap btn-press border min-h-[36px]"
+      class="h-9 w-full text-sm font-bold rounded transition-all duration-200 cursor-pointer whitespace-nowrap btn-press border flex items-center justify-center"
       :class="[
         modelValue === filter.value
           ? 'bg-primary text-white border-primary shadow-md shadow-primary/25'
