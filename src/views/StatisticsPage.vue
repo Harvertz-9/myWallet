@@ -98,17 +98,11 @@
             </div>
           </div>
 
-          <!-- Bar Chart (Income vs Expense) -->
-          <IncomeExpenseBarChart
-            :income="filteredIncome"
-            :expense="filteredExpense"
-          />
+          <!-- Area Chart (Trend like stock market) -->
+          <IncomeExpenseAreaChart :transactions="filteredTransactions" />
 
-          <!-- Pie Chart (Expense Categories) -->
-          <ExpensePieChart :transactions="filteredTransactions" />
-
-          <!-- Pie Chart (Income Categories) -->
-          <IncomePieChart :transactions="filteredTransactions" />
+          <!-- Combined Pie Chart with Dropdown -->
+          <CategoryPieChart :transactions="filteredTransactions" />
 
           <!-- Financial Summary Insights -->
           <StatisticsSummary :transactions="filteredTransactions" />
@@ -122,9 +116,8 @@
 import { ref, computed, onMounted } from "vue";
 import { IonPage, IonContent, IonIcon } from "@ionic/vue";
 import { pieChartOutline } from "ionicons/icons";
-import IncomeExpenseBarChart from "../components/statistics/IncomeExpenseBarChart.vue";
-import ExpensePieChart from "../components/statistics/ExpensePieChart.vue";
-import IncomePieChart from "../components/statistics/IncomePieChart.vue";
+import IncomeExpenseAreaChart from "../components/statistics/IncomeExpenseAreaChart.vue";
+import CategoryPieChart from "../components/statistics/CategoryPieChart.vue";
 import StatisticsSummary from "../components/statistics/StatisticsSummary.vue";
 import LoadingSkeleton from "../components/shared/LoadingSkeleton.vue";
 import EmptyState from "../components/shared/EmptyState.vue";

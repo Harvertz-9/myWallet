@@ -61,7 +61,7 @@
           <Pagination
             :current-page="currentPage"
             :total-pages="totalPages"
-            :total-items="transactionStore.transactions.length"
+            :total-items="todayYesterdayTransactions.length"
             @page-change="onPageChange"
           />
         </div>
@@ -164,6 +164,15 @@ onMounted(() => {
   profileStore.loadProfile();
 });
 
+// Helper: get date string for today and yesterday
+const getDateStr = (offset: number) => {
+  const d = new Date();
+  d.setDate(d.getDate() + offset);
+  return d.toLocaleDateString("en-CA");
+};
+const todayStr = getDateStr(0);
+const yesterdayStr = getDateStr(-1);
+
 // Sorted transactions (newest first)
 const sortedTransactions = computed(() => {
   return [...transactionStore.transactions].sort((a, b) => {
@@ -174,13 +183,20 @@ const sortedTransactions = computed(() => {
   });
 });
 
+// Only today & yesterday for "Transaksi Terbaru"
+const todayYesterdayTransactions = computed(() =>
+  sortedTransactions.value.filter(
+    (tx) => tx.date === todayStr || tx.date === yesterdayStr
+  )
+);
+
 const totalPages = computed(() =>
-  Math.max(1, Math.ceil(sortedTransactions.value.length / itemsPerPage))
+  Math.max(1, Math.ceil(todayYesterdayTransactions.value.length / itemsPerPage))
 );
 
 const paginatedTransactions = computed(() => {
   const start = (currentPage.value - 1) * itemsPerPage;
-  return sortedTransactions.value.slice(start, start + itemsPerPage);
+  return todayYesterdayTransactions.value.slice(start, start + itemsPerPage);
 });
 
 const onPageChange = (page: number) => {

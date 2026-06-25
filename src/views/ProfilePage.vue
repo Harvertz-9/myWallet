@@ -25,7 +25,8 @@
           :occupation="profileStore.occupation"
         />
 
-
+        <!-- Permission Settings -->
+        <PermissionSettings />
 
         <!-- Reset Button -->
         <ResetDataButton @reset="promptReset" />
@@ -118,6 +119,7 @@ import { logOutOutline, personCircleOutline, settingsOutline } from "ionicons/ic
 import { useRouter } from "vue-router";
 import UserCard from "../components/profile/UserCard.vue";
 import ResetDataButton from "../components/profile/ResetDataButton.vue";
+import PermissionSettings from "../components/profile/PermissionSettings.vue";
 import ConfirmationModal from "../components/shared/ConfirmationModal.vue";
 import BaseModal from "../components/base/BaseModal.vue";
 import ToastMessage from "../components/shared/ToastMessage.vue";
