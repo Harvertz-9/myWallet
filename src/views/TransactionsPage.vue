@@ -20,11 +20,60 @@
         <!-- Search Bar -->
         <SearchBar v-model="searchQuery" @update:modelValue="resetPage" />
 
-        <!-- Time Filter Dropdown -->
-        <TimeFilterDropdown v-model="timeFilter" :label="t('transactions.filter_period')" @update:modelValue="resetPage" />
-
-        <!-- Filter Chips -->
-        <FilterChip v-model="activeFilter" @update:modelValue="resetPage" />
+        <!-- Filter Card: Year, Type, Date Range -->
+        <div class="bg-white dark:bg-card-dark rounded-card p-3 space-y-3 shadow-sm border border-gray-100 dark:border-gray-800/40">
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider block mb-1.5">
+                Tahun
+              </label>
+              <input
+                type="number"
+                v-model.number="filterYear"
+                placeholder="2026"
+                class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 text-xs font-semibold rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary placeholder:text-gray-300 dark:placeholder:text-gray-600"
+              />
+            </div>
+            <div>
+              <label class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider block mb-1.5">
+                Jenis
+              </label>
+              <select
+                v-model="filterType"
+                class="w-full appearance-none bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 text-xs font-semibold rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer"
+              >
+                <option value="all">Semua</option>
+                <option value="income">Pemasukan</option>
+                <option value="expense">Pengeluaran</option>
+              </select>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider block mb-1.5">
+                Dari Tanggal
+              </label>
+              <input
+                type="date"
+                v-model="filterDateFrom"
+                class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 text-xs font-semibold rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary [color-scheme:var(--date-picker-scheme)]"
+              />
+            </div>
+            <div>
+              <label class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider block mb-1.5">
+                Sampai Tanggal
+              </label>
+              <input
+                type="date"
+                v-model="filterDateTo"
+                class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 text-xs font-semibold rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary [color-scheme:var(--date-picker-scheme)]"
+              />
+            </div>
+          </div>
+          <p v-if="dateRangeError" class="text-[10px] font-semibold text-red-500 dark:text-red-400 px-0.5">
+            {{ dateRangeError }}
+          </p>
+        </div>
 
         <!-- Loading Skeleton / Empty State / List -->
         <div v-if="transactionStore.loading" class="pt-4">
@@ -89,7 +138,6 @@ import { ref, computed, onMounted, watch } from "vue";
 import { IonPage, IonContent, IonIcon } from "@ionic/vue";
 import { receiptOutline } from "ionicons/icons";
 import SearchBar from "../components/transaction/SearchBar.vue";
-import FilterChip from "../components/transaction/FilterChip.vue";
 import TransactionList from "../components/transaction/TransactionList.vue";
 import LoadingSkeleton from "../components/shared/LoadingSkeleton.vue";
 import EmptyState from "../components/shared/EmptyState.vue";
@@ -97,7 +145,6 @@ import ConfirmationModal from "../components/shared/ConfirmationModal.vue";
 import EditTransactionModal from "../components/forms/EditTransactionModal.vue";
 import ToastMessage from "../components/shared/ToastMessage.vue";
 import Pagination from "../components/shared/Pagination.vue";
-import TimeFilterDropdown, { TimeFilterValue } from "../components/shared/TimeFilterDropdown.vue";
 import { useTransactionStore } from "../stores/transactionStore";
 import { Transaction } from "../types/transaction";
 import { useI18n } from "../utils/i18n";
@@ -107,8 +154,10 @@ const { t } = useI18n();
 
 // Filter States
 const searchQuery = ref("");
-const activeFilter = ref<"all" | "income" | "expense">("all");
-const timeFilter = ref<TimeFilterValue>("all");
+const filterYear = ref<number | "">("");
+const filterType = ref<"all" | "income" | "expense">("all");
+const filterDateFrom = ref("");
+const filterDateTo = ref("");
 
 // Pagination
 const currentPage = ref(1);
@@ -140,48 +189,36 @@ onMounted(() => {
   transactionStore.loadTransactions();
 });
 
-// Helper: filter by time period
-const filterByTimePeriod = (transactions: Transaction[], period: TimeFilterValue): Transaction[] => {
-  if (period === "all") return transactions;
-  const now = new Date();
-  const startOf = (date: Date) => new Date(date.getFullYear(), date.getMonth(), date.getDate());
+// Validate date range (max 7 days)
+const dateRangeError = computed(() => {
+  if (!filterDateFrom.value || !filterDateTo.value) return "";
+  const from = new Date(filterDateFrom.value);
+  const to = new Date(filterDateTo.value);
+  if (from > to) return "Tanggal akhir harus setelah tanggal awal.";
+  const diffDays = (to.getTime() - from.getTime()) / (1000 * 60 * 60 * 24);
+  if (diffDays > 7) return "Rentang tanggal maksimal 7 hari.";
+  return "";
+});
 
-  let fromDate: Date;
-  switch (period) {
-    case "today":
-      fromDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-      break;
-    case "this_week": {
-      const day = now.getDay();
-      const diff = now.getDate() - day + (day === 0 ? -6 : 1);
-      fromDate = new Date(now.getFullYear(), now.getMonth(), diff);
-      break;
+// Clamp date range to max 7 days when both dates are set
+watch([filterDateFrom, filterDateTo], ([from, to]) => {
+  if (from && to) {
+    const fromDate = new Date(from);
+    const toDate = new Date(to);
+    if (fromDate > toDate) {
+      const newFrom = new Date(toDate);
+      newFrom.setDate(newFrom.getDate() - 7);
+      filterDateFrom.value = newFrom.toISOString().split("T")[0];
+      return;
     }
-    case "this_month":
-      fromDate = new Date(now.getFullYear(), now.getMonth(), 1);
-      break;
-    case "last_3_months":
-      fromDate = new Date(now.getFullYear(), now.getMonth() - 2, 1);
-      break;
-    case "last_6_months":
-      fromDate = new Date(now.getFullYear(), now.getMonth() - 5, 1);
-      break;
-    case "this_year":
-      fromDate = new Date(now.getFullYear(), 0, 1);
-      break;
-    case "last_year": {
-      fromDate = new Date(now.getFullYear() - 1, 0, 1);
-      const toDate = new Date(now.getFullYear() - 1, 11, 31);
-      return transactions.filter((tx) => {
-        const d = startOf(new Date(tx.date));
-        return d >= fromDate && d <= toDate;
-      });
+    const diffDays = (toDate.getTime() - fromDate.getTime()) / (1000 * 60 * 60 * 24);
+    if (diffDays > 7) {
+      const newTo = new Date(fromDate);
+      newTo.setDate(newTo.getDate() + 7);
+      filterDateTo.value = newTo.toISOString().split("T")[0];
     }
-    default:
-      return transactions;
   }
-  return transactions.filter((tx) => startOf(new Date(tx.date)) >= fromDate);
-};
+});
 
 // Reactively Filter Transactions
 const filteredTransactions = computed(() => {
@@ -195,10 +232,29 @@ const filteredTransactions = computed(() => {
     return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
   });
 
-  // 1. Filter by time period
-  list = filterByTimePeriod(list, timeFilter.value);
+  // 1. Filter by year
+  if (filterYear.value !== "") {
+    list = list.filter((tx) => new Date(tx.date).getFullYear() === filterYear.value);
+  }
 
-  // 2. Filter by search query
+  // 2. Filter by type
+  if (filterType.value !== "all") {
+    list = list.filter((tx) => tx.type === filterType.value);
+  }
+
+  // 3. Filter by date range
+  if (filterDateFrom.value) {
+    const from = new Date(filterDateFrom.value);
+    from.setHours(0, 0, 0, 0);
+    list = list.filter((tx) => new Date(tx.date) >= from);
+  }
+  if (filterDateTo.value) {
+    const to = new Date(filterDateTo.value);
+    to.setHours(23, 59, 59, 999);
+    list = list.filter((tx) => new Date(tx.date) <= to);
+  }
+
+  // 4. Filter by search query
   if (searchQuery.value.trim()) {
     const query = searchQuery.value.toLowerCase();
     const categoryLabelMap: Record<string, string> = {
@@ -226,11 +282,6 @@ const filteredTransactions = computed(() => {
     });
   }
 
-  // 3. Filter by type
-  if (activeFilter.value !== "all") {
-    list = list.filter((tx) => tx.type === activeFilter.value);
-  }
-
   return list;
 });
 
@@ -252,7 +303,7 @@ const onPageChange = (page: number) => {
 };
 
 // Reset page when filters change
-watch([searchQuery, activeFilter, timeFilter], () => {
+watch([searchQuery, filterYear, filterType, filterDateFrom, filterDateTo], () => {
   currentPage.value = 1;
 });
 

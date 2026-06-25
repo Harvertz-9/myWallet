@@ -1,6 +1,6 @@
 <template>
   <BaseCard padding="md" class="bg-white dark:bg-card-dark">
-    <h3 class="text-sm font-bold text-gray-900 dark:text-gray-100 mb-6 px-1">
+    <h3 class="text-sm font-bold text-gray-900 dark:text-gray-100 px-1">
       Tren Keuangan
     </h3>
 
@@ -8,7 +8,7 @@
       v-if="chartData.labels.length === 0"
       class="flex flex-col items-center justify-center min-h-50 text-center p-4"
     >
-      <div class="text-gray-400 dark:text-gray-600 mb-2">
+      <div class="text-gray-400 dark:text-gray-600 mb-5">
         <ion-icon :icon="trendingUpOutline" class="text-4xl block" />
       </div>
       <p class="text-xs text-gray-500 dark:text-gray-400">
@@ -16,9 +16,21 @@
       </p>
     </div>
 
-    <div v-else class="relative min-h-58 w-full pt-3">
-      <Line :data="chartData" :options="chartOptions" />
-    </div>
+    <template v-else>
+      <div class="flex items-center gap-4 px-1 pt-4 pb-2">
+        <div class="flex items-center gap-1.5 text-xs font-extrabold text-emerald-600 dark:text-emerald-400">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block shadow-sm shadow-emerald-500/30" />
+          {{ abbreviate(totalIncome) }}
+        </div>
+        <div class="flex items-center gap-1.5 text-xs font-extrabold text-red-500 dark:text-red-400">
+          <span class="w-2 h-2 rounded-full bg-red-500 inline-block shadow-sm shadow-red-500/30" />
+          {{ abbreviate(totalExpense) }}
+        </div>
+      </div>
+      <div class="relative min-h-58 w-full">
+        <Line :data="chartData" :options="chartOptions" />
+      </div>
+    </template>
   </BaseCard>
 </template>
 
@@ -46,6 +58,29 @@ const props = defineProps<{
 }>();
 
 const isDark = () => document.body.classList.contains("dark");
+
+const totalIncome = computed(() =>
+  props.transactions
+    .filter((t) => t.type === "income")
+    .reduce((sum, t) => sum + t.amount, 0)
+);
+
+const totalExpense = computed(() =>
+  props.transactions
+    .filter((t) => t.type === "expense")
+    .reduce((sum, t) => sum + t.amount, 0)
+);
+
+const abbreviate = (value: number) => {
+  if (value >= 1000000000) {
+    return "Rp" + (value / 1000000000).toFixed(1).replace(/\.0$/, "") + "M";
+  } else if (value >= 1000000) {
+    return "Rp" + (value / 1000000).toFixed(1).replace(/\.0$/, "") + "jt";
+  } else if (value >= 1000) {
+    return "Rp" + (value / 1000).toFixed(0) + "rb";
+  }
+  return "Rp" + value;
+};
 
 interface DateGroup {
   date: string;
@@ -149,23 +184,7 @@ const chartOptions = computed(() => ({
   },
   plugins: {
     legend: {
-      display: true,
-      position: "top" as const,
-      align: "start" as const,
-      labels: {
-        boxWidth: 12,
-        boxHeight: 12,
-        borderRadius: 4,
-        usePointStyle: true,
-        pointStyle: "circle" as const,
-        padding: 24,
-        color: isDark() ? "#D1D5DB" : "#4B5563",
-        font: {
-          family: "'Inter', sans-serif",
-          size: 11,
-          weight: "bold" as const,
-        },
-      },
+      display: false,
     },
     tooltip: {
       backgroundColor: isDark() ? "#1F2937" : "#fff",
@@ -240,6 +259,7 @@ const chartOptions = computed(() => ({
           size: 10,
         },
         maxRotation: 0,
+        padding: 12,
       },
     },
   },

@@ -8,7 +8,6 @@
         <select
           v-model="selectedType"
           class="appearance-none bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 text-xs font-semibold rounded-xl py-1.5 pl-3 pr-8 focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer min-w-[130px]"
-          @change="selectedType = ($event.target as HTMLSelectElement).value"
         >
           <option value="expense">Pengeluaran</option>
           <option value="income">Pemasukan</option>
