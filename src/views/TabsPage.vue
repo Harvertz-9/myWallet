@@ -21,6 +21,12 @@
           <ion-label>{{ t('tab.statistics') }}</ion-label>
         </ion-tab-button>
 
+        <!-- Financial Tools Tab -->
+        <ion-tab-button tab="financial-tools" href="/tabs/financial-tools">
+          <ion-icon aria-hidden="true" :icon="calculator" />
+          <ion-label>{{ t('tab.financial_tools') }}</ion-label>
+        </ion-tab-button>
+
         <!-- Profile Tab -->
         <ion-tab-button tab="profile" href="/tabs/profile">
           <ion-icon aria-hidden="true" :icon="personCircle" />
@@ -41,7 +47,7 @@ import {
   IonPage,
   IonRouterOutlet,
 } from "@ionic/vue";
-import { wallet, receipt, pieChart, personCircle } from "ionicons/icons";
+import { wallet, receipt, pieChart, calculator, personCircle } from "ionicons/icons";
 import { useI18n } from "../utils/i18n";
 
 const { t } = useI18n();

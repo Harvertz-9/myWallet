@@ -40,6 +40,10 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import("@/views/StatisticsPage.vue"),
       },
       {
+        path: "financial-tools",
+        component: () => import("@/views/FinancialToolsPage.vue"),
+      },
+      {
         path: "profile",
         component: () => import("@/views/ProfilePage.vue"),
       },
