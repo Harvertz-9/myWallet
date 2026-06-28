@@ -167,7 +167,7 @@ ion-label.input-label {
   margin-bottom: 4px !important;
 }
 ion-input.input-field {
-  --background: #f3f4f6;
+  --background: inherit;
   --border-color: transparent;
   --border-radius: 14px;
   --border-width: 2px;
